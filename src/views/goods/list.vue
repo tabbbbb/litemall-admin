@@ -65,7 +65,11 @@
 
       <el-table-column align="center" label="专柜价格" prop="counterPrice"/>
 
-      <el-table-column align="center" label="当前价格" prop="retailPrice"/>
+      <el-table-column align="center" label="一类价格" prop="onePrice"/>
+
+      <el-table-column align="center" label="二类价格" prop="twoPrice"/>
+
+      <el-table-column align="center" label="三类价格" prop="threePrice"/>
 
       <el-table-column align="center" label="是否新品" prop="isNew">
         <template slot-scope="scope">
@@ -161,6 +165,7 @@ export default {
         this.list = response.data.data.items
         this.total = response.data.data.total
         this.listLoading = false
+        console.log(this.list)
       }).catch(() => {
         this.list = []
         this.total = 0
@@ -199,8 +204,8 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['商品ID', '商品编号', '名称', '专柜价格', '当前价格', '是否新品', '是否热品', '是否在售', '首页主图', '宣传图片列表', '商品介绍', '详细介绍', '商品图片', '商品单位', '关键字', '类目ID', '品牌商ID']
-        const filterVal = ['id', 'goodsSn', 'name', 'counterPrice', 'retailPrice', 'isNew', 'isHot', 'isOnSale', 'listPicUrl', 'gallery', 'brief', 'detail', 'picUrl', 'goodsUnit', 'keywords', 'categoryId', 'brandId']
+        const tHeader = ['商品ID', '商品编号', '名称', '专柜价格', '一类价格', '二类价格', '三类价格', '是否新品', '是否热品', '是否在售', '首页主图', '宣传图片列表', '商品介绍', '详细介绍', '商品图片', '商品单位', '关键字', '类目ID', '品牌商ID']
+        const filterVal = ['id', 'goodsSn', 'name', 'counterPrice', 'onePrice', 'twoPrice', 'threePrice', 'isNew', 'isHot', 'isOnSale', 'listPicUrl', 'gallery', 'brief', 'detail', 'picUrl', 'goodsUnit', 'keywords', 'categoryId', 'brandId']
         excel.export_json_to_excel2(tHeader, this.list, filterVal, '商品信息')
         this.downloadLoading = false
       })

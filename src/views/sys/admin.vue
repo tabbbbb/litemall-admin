@@ -35,7 +35,7 @@
             </el-button>
             <el-dropdown-menu slot="dropdown">
               <template slot-scope="list">
-                <el-dropdown-item v-if="scope.row.roleIds.indexOf(1) == -1" v-permission="['POST /admin/admin/addUser']" split-button @click.native="showUser(scope.row)">用户管理</el-dropdown-item>
+                <el-dropdown-item v-if="scope.row.roleIds.indexOf(1) == -1" v-permission="['PUT /admin/admin/adminIds']" split-button @click.native="showUser(scope.row)">用户管理</el-dropdown-item>
                 <el-dropdown-item v-permission="['POST /admin/admin/update']"  split-button @click.native="handleUpdate(scope.row)">编辑</el-dropdown-item>
                 <el-dropdown-item v-permission="['POST /admin/admin/delete']"  split-button @click.native="handleDelete(scope.row)">删除</el-dropdown-item>
               </template>
@@ -109,7 +109,7 @@
         </el-table-column>
         <el-table-column prop="level" label="用户等级" show-overflow-tooltip>
           <template slot-scope="scope">
-            <el-tag >{{ levelDic[scope.row.userLevel] }}</el-tag>
+            <el-tag >{{ levelDic[scope.row.userLevel-1] }}</el-tag>
           </template>
         </el-table-column>
 
@@ -178,6 +178,7 @@ import { listAdmin, createAdmin, updateAdmin, deleteAdmin } from '@/api/admin'
 import { roleOptions } from '@/api/role'
 import { uploadPath } from '@/api/storage'
 import { getToken } from '@/utils/auth'
+import { listVip} from '@/api/vipclass'
 import {fetchList ,requestAdminIds } from '@/api/user'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -250,6 +251,13 @@ export default {
     }
   },
   created() {
+    this.levelDic = []
+    listVip(null).then(response => {
+      console.log(response)
+      response.data.data.items.forEach(item =>{
+        this.levelDic.push(item.vipType)
+      })
+    } )
     this.getList()
 
     roleOptions()

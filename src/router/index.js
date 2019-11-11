@@ -94,7 +94,7 @@ export const asyncRouterMap = [
         name: 'user',
         meta: {
           perms: ['GET /admin/user/list'],
-          title: '会员管理',
+          title: '用户管理',
           noCache: true
         }
       }
@@ -122,16 +122,16 @@ export const asyncRouterMap = [
           noCache: true
         }
       },
-      {
-        path: 'brand',
-        component: () => import('@/views/mall/brand'),
-        name: 'brand',
-        meta: {
-          perms: ['GET /admin/brand/list', 'POST /admin/brand/create', 'GET /admin/brand/read', 'POST /admin/brand/update', 'POST /admin/brand/delete'],
-          title: '品牌制造商',
-          noCache: true
-        }
-      },
+      // {
+      //   path: 'brand',
+      //   component: () => import('@/views/mall/brand'),
+      //   name: 'brand',
+      //   meta: {
+      //     perms: ['GET /admin/brand/list', 'POST /admin/brand/create', 'GET /admin/brand/read', 'POST /admin/brand/update', 'POST /admin/brand/delete'],
+      //     title: '品牌制造商',
+      //     noCache: true
+      //   }
+      // },
       {
         path: 'vipclass',
         component: () => import('@/views/mall/vipclass'),
@@ -227,16 +227,16 @@ export const asyncRouterMap = [
         },
         hidden: true
       },
-      {
-        path: 'comment',
-        component: () => import('@/views/goods/comment'),
-        name: 'goodsComment',
-        meta: {
-          perms: ['GET /admin/comment/list', 'POST /admin/comment/delete'],
-          title: '商品评论',
-          noCache: true
-        }
-      }
+      // {
+      //   path: 'comment',
+      //   component: () => import('@/views/goods/comment'),
+      //   name: 'goodsComment',
+      //   meta: {
+      //     perms: ['GET /admin/comment/list', 'POST /admin/comment/delete'],
+      //     title: '商品评论',
+      //     noCache: true
+      //   }
+      // }
     ]
   },
   {
@@ -246,7 +246,7 @@ export const asyncRouterMap = [
     alwaysShow: true,
     name: 'promotionManage',
     meta: {
-      title: '推广管理',
+      title: '页面管理',
       icon: 'chart'
     },
     children: [
@@ -256,61 +256,42 @@ export const asyncRouterMap = [
         name: 'ad',
         meta: {
           perms: ['GET /admin/ad/list', 'POST /admin/ad/create', 'GET /admin/ad/read', 'POST /admin/ad/update', 'POST /admin/ad/delete'],
-          title: '广告管理',
+          title: '轮播图与页面图片',
           noCache: true
         }
       },
-      {
-        path: 'coupon',
-        component: () => import('@/views/promotion/coupon'),
-        name: 'coupon',
-        meta: {
-          perms: ['GET /admin/coupon/list', 'POST /admin/coupon/create', 'POST /admin/coupon/update', 'POST /admin/coupon/delete'],
-          title: '优惠券管理',
-          noCache: true
-        }
-      },
-      {
-        path: 'couponDetail',
-        component: () => import('@/views/promotion/couponDetail'),
-        name: 'couponDetail',
-        meta: {
-          perms: ['GET /admin/coupon/list', 'GET /admin/coupon/listuser'],
-          title: '优惠券详情',
-          noCache: true
-        },
-        hidden: true
-      },
-      {
-        path: 'topic',
-        component: () => import('@/views/promotion/topic'),
-        name: 'topic',
-        meta: {
-          perms: ['GET /admin/topic/list', 'POST /admin/topic/create', 'GET /admin/topic/read', 'POST /admin/topic/update', 'POST /admin/topic/delete'],
-          title: '专题管理',
-          noCache: true
-        }
-      },
-      {
-        path: 'groupon-rule',
-        component: () => import('@/views/promotion/grouponRule'),
-        name: 'grouponRule',
-        meta: {
-          perms: ['GET /admin/groupon/list', 'POST /admin/groupon/create', 'POST /admin/groupon/update', 'POST /admin/groupon/delete'],
-          title: '团购规则',
-          noCache: true
-        }
-      },
-      {
-        path: 'groupon-activity',
-        component: () => import('@/views/promotion/grouponActivity'),
-        name: 'grouponActivity',
-        meta: {
-          perms: ['GET /admin/groupon/listRecord'],
-          title: '团购活动',
-          noCache: true
-        }
-      }
+      // {
+      //   path: 'coupon',
+      //   component: () => import('@/views/promotion/coupon'),
+      //   name: 'coupon',
+      //   meta: {
+      //     perms: ['GET /admin/coupon/list', 'POST /admin/coupon/create', 'POST /admin/coupon/update', 'POST /admin/coupon/delete'],
+      //     title: '优惠券管理',
+      //     noCache: true
+      //   }
+      // },
+      // {
+      //   path: 'couponDetail',
+      //   component: () => import('@/views/promotion/couponDetail'),
+      //   name: 'couponDetail',
+      //   meta: {
+      //     perms: ['GET /admin/coupon/list', 'GET /admin/coupon/listuser'],
+      //     title: '优惠券详情',
+      //     noCache: true
+      //   },
+      //   hidden: true
+      // },
+      // {
+      //   path: 'topic',
+      //   component: () => import('@/views/promotion/topic'),
+      //   name: 'topic',
+      //   meta: {
+      //     perms: ['GET /admin/topic/list', 'POST /admin/topic/create', 'GET /admin/topic/read', 'POST /admin/topic/update', 'POST /admin/topic/delete'],
+      //     title: '专题管理',
+      //     noCache: true
+      //   }
+      // },
+
     ]
   },
 
@@ -399,26 +380,26 @@ export const asyncRouterMap = [
           noCache: true
         }
       },
-      {
-        path: 'order',
-        component: () => import('@/views/config/order'),
-        name: 'configOrder',
-        meta: {
-          perms: ['GET /admin/config/order', 'POST /admin/config/order'],
-          title: '订单配置',
-          noCache: true
-        }
-      },
-      {
-        path: 'wx',
-        component: () => import('@/views/config/wx'),
-        name: 'configWx',
-        meta: {
-          perms: ['GET /admin/config/wx', 'POST /admin/config/wx'],
-          title: '小程序配置',
-          noCache: true
-        }
-      }
+      // {
+      //   path: 'order',
+      //   component: () => import('@/views/config/order'),
+      //   name: 'configOrder',
+      //   meta: {
+      //     perms: ['GET /admin/config/order', 'POST /admin/config/order'],
+      //     title: '订单配置',
+      //     noCache: true
+      //   }
+      // },
+      // {
+      //   path: 'wx',
+      //   component: () => import('@/views/config/wx'),
+      //   name: 'configWx',
+      //   meta: {
+      //     perms: ['GET /admin/config/wx', 'POST /admin/config/wx'],
+      //     title: '小程序配置',
+      //     noCache: true
+      //   }
+      // }
     ]
   },
 

@@ -26,7 +26,7 @@
 
       <el-table-column align="center" label="用户等级" prop="userLevel">
         <template slot-scope="scope">
-          <el-tag >{{ levelDic[scope.row.userLevel] }}</el-tag>
+          <el-tag >{{ levelDic[scope.row.userLevel-1] }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="状态" prop="status">
@@ -46,6 +46,7 @@
                 <el-dropdown-item split-button @click.native="showCollect(scope.row)">用户收藏</el-dropdown-item>
                 <el-dropdown-item split-button @click.native="showFootprint(scope.row)">用户足迹</el-dropdown-item>
                 <el-dropdown-item split-button @click.native="showSearch(scope.row)">搜索记录</el-dropdown-item>
+                <el-dropdown-item split-button @click.native="showVipLevel(scope.row)" v-permission="['PUT /admin/user/userLevel ']" >会员等级</el-dropdown-item>
               </template>
             </el-dropdown-menu>
           </el-dropdown>
@@ -156,12 +157,30 @@
     <pagination v-show="totalFootprint>0" :total="totalFootprint" :page.sync="listFootprintQuery.page" :limit.sync="listFootprintQuery.limit" @pagination="getFootprintList" />
     </el-dialog>
 
+    <el-dialog :visible.sync="dialogVipLevelVisible" :title="vipLevelUser.nickname" >
+      <!--<el-select v-model="vipLevelUser.level"  placeholder="请选择">-->
+        <!--<el-option v-for="(item,index) in levelDic" :key="index+1" :label="item" :value="index+1"/>-->
+      <!--</el-select>-->
+      <el-form ref="editValidateForm" :model="vipLevelUser">
+        <el-select v-model="vipLevelUser.level"  placeholder="请选择" @change="$forceUpdate()">
+        <el-option v-for="(item,index) in levelDic" :key="index+1" :label="item" :value="index+1"/>
+        </el-select>
+        <el-button type="primary" @click="updateUserLevel">确认修改</el-button>
+
+      </el-form>
+
+    </el-dialog>
+
+
+
+
   </div>
 </template>
 
 <script>
 
-import { listFootprint, listHistory, listCollect, fetchList, addressByUserId } from '@/api/user'
+import {updateUserLevel, listFootprint, listHistory, listCollect, fetchList, addressByUserId } from '@/api/user'
+import { listVip} from '@/api/vipclass'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -188,7 +207,7 @@ export default {
       dialogCollectVisible: false,
       dialogSearchVisible: false,
       dialogFootprintVisible: false,
-
+      dialogVipLevelVisible : false,
       genderDic: ['未知', '男', '女'],
       levelDic: ['普通用户', 'VIP用户', '高级VIP用户'],
       statusDic: ['可用', '禁用', '注销'],
@@ -220,7 +239,8 @@ export default {
         keyword: null,
         sort: 'add_time',
         order: 'desc'
-      },listFootprintQuery: {
+      },
+      listFootprintQuery: {
         page: 1,
         limit: 20,
         userId: undefined,
@@ -228,9 +248,17 @@ export default {
         sort: 'add_time',
         order: 'desc'
       },
+      vipLevelUser: {}
     }
   },
   created() {
+    this.levelDic = []
+    listVip(null).then(response => {
+      console.log(response)
+      response.data.data.items.forEach(item =>{
+        this.levelDic.push(item.vipType)
+      })
+    } )
     this.getList()
   },
   methods: {
@@ -382,7 +410,21 @@ export default {
         excel.export_json_to_excel2(tHeader, this.listFootprint, filterVal, '用户足迹')
         this.downloadLoading = false
       })
+    },
+    showVipLevel(row){
+      this.dialogVipLevelVisible = true
+      this.vipLevelUser['nickname'] = row.nickname
+      this.vipLevelUser['id'] = row.id
+      this.vipLevelUser['level'] = row.userLevel
+    },
+    updateUserLevel(){
+      updateUserLevel(this.vipLevelUser).then(response =>{
+        this.$message.success('会员修改成功')
+        this.getList()
+      })
+      this.dialogVipLevelVisible = false
     }
+
   }
 }
 </script>

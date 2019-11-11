@@ -57,7 +57,16 @@ export function addressByUserId(query) {
 
 export function requestAdminIds(query) {
   return request({
-    url: '/user/adminIds',
+    url: '/admin/adminIds',
+    method: 'put',
+    params: query
+  })
+}
+
+
+export function updateUserLevel(query) {
+  return request({
+    url: '/user/userLevel',
     method: 'put',
     params: query
   })

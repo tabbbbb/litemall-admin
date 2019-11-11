@@ -14,9 +14,11 @@
 
       <el-table-column align="center" label="会员等级" prop="vipType"/>
 
-      <el-table-column align="center" label="最低积分" prop="vipCount"/>
-
-      <el-table-column align="center" label="折扣" prop="discount"/>
+      <el-table-column align="center" label="价格类型" prop="discount">
+        <template slot-scope="scope">
+          <el-tag>{{priceList[scope.row.discount-1]}}</el-tag>
+        </template>
+      </el-table-column>
 
       <el-table-column align="center" label="操作" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -34,12 +36,14 @@
         <el-form-item label="会员等级" prop="vipType">
           <el-input v-model="dataForm.vipType"/>
         </el-form-item>
-        <el-form-item label="最低积分" prop="vipCount">
-          <el-input v-model="dataForm.vipCount"/>
+        <el-form-item label="价格类别" prop="discount">
+          <template slot-scope="scope">
+            <el-select v-model="dataForm.discount"  placeholder="请选择">
+              <el-option v-for="(item,index) in priceList" :key="index+1" :label="item" :value="index+1" ></el-option>
+            </el-select>
+          </template>
         </el-form-item>
-        <el-form-item label="折扣" prop="discount">
-          <el-input v-model="dataForm.discount"/>
-        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -87,9 +91,10 @@ export default {
   components: { Pagination },
   data() {
     return {
-      list: undefined,
+      list: null,
       total: 0,
       listLoading: true,
+      priceList: ['一级价格','二级价格','三级价格'],
       listQuery: {
         page: 1,
         limit: 20,
@@ -112,7 +117,10 @@ export default {
       rules: {
         vipType: [
           { required: true, message: '会员等级名称不能为空', trigger: 'blur' }
-        ]
+        ],
+        discount:[
+          {required:true,message:'会员价格类别必须选择',trigger:'blur'}
+          ]
       },
       downloadLoading: false,
       show: false
@@ -241,20 +249,21 @@ export default {
         })
     },
     handleDownload() {
+      this.list.forEach(item =>{
+        item.discount = this.priceList[item.discount-1]
+      })
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
           const tHeader = [
-            'ID',
             '会员等级名称',
-            '最低积分',
-            '折扣'
+            '价格类别'
           ]
-          const filterVal = ['id', 'vipType', 'vipCount', 'discount']
+          const filterVal = [ 'vipType', 'discount']
           excel.export_json_to_excel2(
             tHeader,
             this.list,
             filterVal,
-            '品牌商信息'
+            '会员等级信息'
           )
           this.downloadLoading = false
         })

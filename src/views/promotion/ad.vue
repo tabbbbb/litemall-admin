@@ -3,37 +3,43 @@
 
     <!-- 查询和其他操作 -->
     <div class="filter-container">
-      <el-input v-model="listQuery.name" clearable class="filter-item" style="width: 200px;" placeholder="请输入广告标题"/>
-      <el-input v-model="listQuery.content" clearable class="filter-item" style="width: 200px;" placeholder="请输入广告内容"/>
-      <el-button v-permission="['GET /admin/ad/list']" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查找</el-button>
-      <el-button v-permission="['POST /admin/ad/create']" class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">添加</el-button>
-      <el-button :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <el-select v-model="listQuery.position" placeholder="请选择位置" @change="getList">
+        <el-option :value="-1" label="全部"/>
+        <el-option v-for="(item,index) in positionChinese" :label="item" :key="index+1" :value="index+1"/>
+      </el-select>
+      <el-select v-model="listQuery.enabled" placeholder="请选择"  @change="getList">
+        <el-option :value="null" label="全部"/>
+        <el-option :value="1" label="启用"/>
+        <el-option :value="0" label="不启用"/>
+      </el-select>
+      <el-button v-permission="['POST /admin/ad/create']" class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate" style="margin-bottom: 0px">添加</el-button>
+      <el-button :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload" style="margin-bottom: 0px">导出</el-button>
     </div>
 
     <!-- 查询结果 -->
     <el-table v-loading="listLoading" :data="list" element-loading-text="正在查询中。。。" border fit highlight-current-row>
 
-      <el-table-column align="center" label="广告ID" prop="id" sortable/>
-
-      <el-table-column align="center" label="广告标题" prop="name"/>
-
-      <el-table-column align="center" label="广告内容" prop="content"/>
-
-      <el-table-column align="center" label="广告图片" prop="url">
+      <el-table-column align="center" label="位置" prop="position">
         <template slot-scope="scope">
-          <img v-if="scope.row.url" :src="scope.row.url" width="80">
+          <el-tag >{{ positionChinese[scope.row.position-1] }}</el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="广告位置" prop="position"/>
+      <el-table-column align="center" label="图片" prop="url">
+        <template slot-scope="scope">
+          <img  :src="scope.row.urlList[0]" width="80">
+        </template>
+      </el-table-column>
 
-      <el-table-column align="center" label="活动链接" prop="link"/>
+
+      <el-table-column align="center" label="跳转链接" prop="link"/>
 
       <el-table-column align="center" label="是否启用" prop="enabled">
         <template slot-scope="scope">
           <el-tag :type="scope.row.enabled ? 'success' : 'error' ">{{ scope.row.enabled ? '启用' : '不启用' }}</el-tag>
         </template>
       </el-table-column>
+
 
       <el-table-column align="center" label="操作" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -46,47 +52,81 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :before-close="closeFrom">
       <el-form ref="dataForm" :rules="rules" :model="dataForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="广告标题" prop="name">
-          <el-input v-model="dataForm.name"/>
-        </el-form-item>
-        <el-form-item label="广告内容" prop="content">
-          <el-input v-model="dataForm.content"/>
-        </el-form-item>
-        <el-form-item label="广告图片" prop="url">
-          <el-upload
-            :headers="headers"
-            :action="uploadPath"
-            :show-file-list="false"
-            :on-success="uploadUrl"
-            class="avatar-uploader"
-            accept=".jpg,.jpeg,.png,.gif">
-            <img v-if="dataForm.url" :src="dataForm.url" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"/>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="广告位置" prop="position">
+
+        <el-form-item label="图片位置" prop="position">
           <el-select v-model="dataForm.position" placeholder="请选择">
-            <el-option :value="1" label="首页"/>
+            <el-option v-for="(item,index) in positionChinese" :label="item" :key="index+1"  :value="index+1"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="活动链接" prop="link">
+
+        <el-form-item label="标题" prop="name" v-if="dataForm.position != 1">
+          <el-input v-model="dataForm.name"/>
+        </el-form-item>
+
+
+        <el-form-item  label="图片" prop="urlList">
+          <el-button icon="el-icon-tickets" type="primary" @click="showImage()" >设置</el-button>
+        </el-form-item>
+
+
+        <el-form-item label="跳转链接" prop="link">
           <el-input v-model="dataForm.link"/>
         </el-form-item>
+
+
+
         <el-form-item label="是否启用" prop="enabled">
           <el-select v-model="dataForm.enabled" placeholder="请选择">
             <el-option :value="true" label="启用"/>
             <el-option :value="false" label="不启用"/>
           </el-select>
         </el-form-item>
+
+
       </el-form>
+
+
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button @click="closeFrom">取消</el-button>
         <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">确定</el-button>
         <el-button v-else type="primary" @click="updateData">确定</el-button>
       </div>
     </el-dialog>
+
+
+
+    <el-dialog title="图片设置" :visible.sync="slideshowVisible">
+      <el-carousel indicator-position="outside" trigger="click" v-if="fileList.length > 1">
+        <el-carousel-item v-for="item in fileList"  :key="item.url">
+          <img :src="item.url"  style="width:100%;height: 100%"/>
+        </el-carousel-item>
+      </el-carousel>
+      <img :src="fileList[0].url"  style="width:100%;height: 300px;" v-if="fileList.length == 1"/>
+
+      <el-badge :value="fileList.length" class="item">
+        <el-upload  ref="uploadFile"
+                    :disabled="disabledFlag"
+                    :headers="headers"
+                    :action="uploadPath"
+                    :on-change="fileFlag"
+                    list-type="picture-card"
+                    :file-list="fileList"
+                    :limit="10"
+                    :on-exceed="sizeExceed"
+                    :on-remove="removeFile"
+                    :on-success="submitSuccess"
+                    :on-error="submitError"
+                    accept=".jpg,.jpeg,.png,.gif"
+        >
+          <i class="el-icon-plus"></i>
+        </el-upload>
+      </el-badge>
+
+      <p style="position: relative;">注意：轮播图的最大限制是10，请不要传入不是jpg,jpeg,png,gif后缀的文件 <el-button  type="primary" @click="slideshowVisible = false" style="position: absolute;right: 0">确定</el-button> </p>
+    </el-dialog>
+
 
   </div>
 </template>
@@ -129,22 +169,27 @@ export default {
   data() {
     return {
       uploadPath,
-      list: undefined,
+      list: null,
       total: 0,
       listLoading: true,
+      positionChinese:['轮播图','底位1','底位2','底位3'],
+      fileList:[],
+      idCache: undefined,
+      slideshowVisible: false,
+      disabledFlag: false,
+      deleteFlag : false,
       listQuery: {
         page: 1,
         limit: 20,
-        name: undefined,
-        content: undefined,
+        position:undefined,
+        enabled:undefined,
         sort: 'add_time',
         order: 'desc'
       },
       dataForm: {
         id: undefined,
         name: undefined,
-        content: undefined,
-        url: undefined,
+        url: null,
         link: undefined,
         position: 1,
         enabled: true
@@ -157,12 +202,9 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: '广告标题不能为空', trigger: 'blur' }
+          { required: true, message: '标题不能为空', trigger: 'blur' }
         ],
-        content: [
-          { required: true, message: '广告内容不能为空', trigger: 'blur' }
-        ],
-        url: [{ required: true, message: '广告链接不能为空', trigger: 'blur' }]
+        url: [{ required: true, message: '图片不能为空', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -220,6 +262,10 @@ export default {
     },
     createData() {
       this.$refs['dataForm'].validate(valid => {
+        if (this.dataForm.url == "" || this.dataForm.url == null || this.dataForm.url == undefined){
+          this.$message.warning('图片必须选择一张')
+          return
+        }
         if (valid) {
           createAd(this.dataForm)
             .then(response => {
@@ -229,17 +275,24 @@ export default {
                 title: '成功',
                 message: '创建成功'
               })
+              this.getList()
             })
             .catch(response => {
               this.$notify.error({
                 title: '失败',
                 message: response.data.errmsg
               })
+              this.getList()
             })
+          this.$refs.uploadFile.clearFiles()
+          this.fileList = []
+
         }
+
       })
     },
     handleUpdate(row) {
+      this.idCache = row.id
       this.dataForm = Object.assign({}, row)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -250,6 +303,10 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
+          if (this.dataForm.url == "" || this.dataForm.url == null || this.dataForm.url == undefined){
+            this.$message.warning('图片必须选择一张')
+            return
+          }
           updateAd(this.dataForm)
             .then(() => {
               for (const v of this.list) {
@@ -262,15 +319,18 @@ export default {
               this.dialogFormVisible = false
               this.$notify.success({
                 title: '成功',
-                message: '更新广告成功'
+                message: '更新成功'
               })
+              this.getList()
             })
             .catch(response => {
               this.$notify.error({
                 title: '失败',
                 message: response.data.errmsg
               })
+              this.getList()
             })
+
         }
       })
     },
@@ -315,6 +375,73 @@ export default {
         excel.export_json_to_excel2(tHeader, this.list, filterVal, '广告信息')
         this.downloadLoading = false
       })
+    },
+    sizeExceed(){
+      alert('数量不能超过10')
+      this.disabledFlag = true
+    },
+    getFileSuffix(fileName){
+      var index = fileName.lastIndexOf('.')
+      console.log(fileName.substring(index))
+      return fileName.substring(index)
+    },
+    fileFlag(file, fileList){
+      var fileName = this.getFileSuffix(file.name)
+      if (fileName != ".jpg" &&  fileName != ".jpeg" && fileName != ".png" && fileName != ".gif"){
+        this.$refs.uploadFile.clearFiles()
+        alert('格式错误！！！')
+        this.fileList = []
+        return
+      }
+      this.fileList = fileList
+    },
+    removeFile(file, fileList){
+      if (fileList.length > 0){
+        this.dataForm.url = fileList[0].url
+        for (let i = 1; i <fileList.length; i++) {
+          this.dataForm.url += ","+fileList[i].url
+        }
+      } else{
+        this.deleteFlag = true
+        this.dataForm.url = ""
+      }
+      this.fileList = fileList
+    },
+    submitSuccess(response, file, fileList){
+      if (this.dataForm.url == undefined){
+        this.dataForm.url = response.data.url
+      }else{
+        this.dataForm.url += ","+response.data.url
+      }
+
+    },
+    submitError(error, file, fileList){
+      this.$message.error('上传失败：'+error)
+      this.$refs.uploadFile.clearFiles()
+    },
+    showImage(){
+      this.slideshowVisible = true
+      this.list.forEach(item =>{
+        if (item.id ==this.idCache && !this.isUrl(item.urlList) && this.dialogStatus =='update' && !this.deleteFlag){
+          item.urlList.forEach(url =>{
+            this.fileList.push({'name':item.name,'url':url})
+          })
+        }
+
+      })
+    },
+    isUrl(urlList){
+      for (let i = 0; i < this.fileList.length; i++) {
+        if (urlList.indexOf(this.fileList[i].url) != -1){
+          return true
+        }
+        return false
+      }
+    },
+    closeFrom(done){
+      console.log(1)
+      this.fileList = []
+      this.dialogFormVisible = false
     }
   }
 }

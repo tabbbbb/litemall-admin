@@ -13,15 +13,27 @@
           <el-input v-model="goods.name"/>
         </el-form-item>
         <el-form-item label="专柜价格" prop="counterPrice">
-          <el-input v-model="goods.counterPrice" maxlength="7" placeholder="0.00">
+          <el-input v-model.number="goods.counterPrice" maxlength="7" placeholder="0.00">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
-        <el-form-item label="当前价格" prop="retailPrice">
-          <el-input v-model="goods.retailPrice" maxlength="7" placeholder="0.00">
+        <el-form-item label="一类价格" prop="counterPrice">
+          <el-input v-model.number="goods.onePrice" maxlength="7" placeholder="0.00">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
+        <el-form-item label="二类价格" prop="counterPrice">
+          <el-input v-model.number="goods.twoPrice" maxlength="7" placeholder="0.00">
+            <template slot="append">元</template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="三类价格" prop="counterPrice">
+          <el-input v-model.number="goods.threePrice" maxlength="7" placeholder="0.00">
+            <template slot="append">元</template>
+          </el-input>
+        </el-form-item>
+
+
         <el-form-item label="是否新品" prop="isNew">
           <el-radio-group v-model="goods.isNew">
             <el-radio :label="true">新品</el-radio>
@@ -93,11 +105,6 @@
           <el-cascader :options="categoryList" expand-trigger="hover" @change="handleCategoryChange"/>
         </el-form-item>
 
-        <el-form-item label="所属品牌商">
-          <el-select v-model="goods.brandId">
-            <el-option v-for="item in brandList" :key="item.value" :label="item.label" :value="item.value"/>
-          </el-select>
-        </el-form-item>
 
         <el-form-item label="商品简介">
           <el-input v-model="goods.brief"/>
@@ -109,22 +116,18 @@
       </el-form>
     </el-card>
 
+
+
     <el-card class="box-card">
       <h3>商品规格</h3>
-      <el-row :gutter="20" type="flex" align="middle" style="padding:20px 0;">
-        <el-col :span="10">
-          <el-radio-group v-model="multipleSpec" @change="specChanged">
-            <el-radio-button :label="false">默认标准规格</el-radio-button>
-            <el-radio-button :label="true">多规格支持</el-radio-button>
-          </el-radio-group>
-        </el-col>
-        <el-col v-if="multipleSpec" :span="10">
-          <el-button :plain="true" type="primary" @click="handleSpecificationShow">添加</el-button>
-        </el-col>
-      </el-row>
+      <el-button :plain="true" type="primary" @click="handleSpecificationShow">添加</el-button>
 
       <el-table :data="specifications">
+
+
         <el-table-column property="specification" label="规格名"/>
+
+
         <el-table-column property="value" label="规格值">
           <template slot-scope="scope">
             <el-tag type="primary">
@@ -132,17 +135,41 @@
             </el-tag>
           </template>
         </el-table-column>
+
+
+
         <el-table-column property="picUrl" label="规格图片">
           <template slot-scope="scope">
             <img v-if="scope.row.picUrl" :src="scope.row.picUrl" width="40">
           </template>
         </el-table-column>
-        <el-table-column
-          v-if="multipleSpec"
-          align="center"
-          label="操作"
-          width="250"
-          class-name="small-padding fixed-width">
+
+
+
+        <el-table-column label="专柜价格"  prop="counterPrice"/>
+
+
+        <el-table-column label="一类价格" prop="onePrice" />
+
+
+        <el-table-column label="二类价格" prop="twoPrice"/>
+
+
+        <el-table-column label="三类价格" prop="threePrice"/>
+
+
+        <el-table-column label="此规格库存" prop="number" />
+
+
+        <el-table-column property="isDefault" label="是否默认">
+          <template slot-scope="scope">
+            <el-tag type="primary">
+              {{ scope.row.isDefault == 1 ? "是":"否"}}
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column align="center" label="操作" width="250" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="danger" size="mini" @click="handleSpecificationDelete(scope.row)">删除</el-button>
           </template>
@@ -150,28 +177,64 @@
       </el-table>
 
       <el-dialog :visible.sync="specVisiable" title="设置规格">
-        <el-form
-          ref="specForm"
-          :rules="rules"
-          :model="specForm"
-          status-icon
-          label-position="left"
-          label-width="100px"
-          style="width: 400px; margin-left:50px;">
+        <el-form ref="specForm" :rules="rules" :model="specForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+
+
           <el-form-item label="规格名" prop="specification">
-            <el-input v-model="specForm.specification" maxlength="7"/>
+            <el-input v-model="specForm.specification"/>
           </el-form-item>
+
           <el-form-item label="规格值" prop="value">
-            <el-input v-model="specForm.value" maxlength="7"/>
+            <el-input v-model="specForm.value"/>
           </el-form-item>
+
+
+          <el-form-item label="此规格库存">
+            <el-input v-model.number="specForm.number" />
+          </el-form-item>
+
+
+          <el-form-item label="专柜价格">
+            <el-input v-model.number="specForm.counterPrice" maxlength="7" placeholder="0.00" :disabled="disabledFlag">
+              <template slot="append">元</template>
+            </el-input>
+          </el-form-item>
+
+
+
+          <el-form-item label="一类价格" >
+            <el-input v-model.number="specForm.onePrice" maxlength="7" placeholder="0.00"  :disabled="disabledFlag">
+              <template slot="append">元</template>
+            </el-input>
+          </el-form-item>
+
+
+
+          <el-form-item label="二类价格" >
+            <el-input v-model.number="specForm.twoPrice" maxlength="7" placeholder="0.00" :disabled="disabledFlag" >
+              <template slot="append">元</template>
+            </el-input>
+          </el-form-item>
+
+
+
+          <el-form-item label="三类价格">
+            <el-input v-model.number="specForm.threePrice" maxlength="7" placeholder="0.00"  :disabled="disabledFlag" >
+              <template slot="append">元</template>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item property="isDefault" label="是否默认">
+            <el-select @change="changeDefault" v-model="specForm.isDefault">
+              <el-tooltip class="item" effect="dark" content="选中默认与商品的展示价格相同" placement="top">
+                <el-option :value="1" label="是" key="1"/>
+              </el-tooltip>
+              <el-option :value="0" label="否"  key="0"/>
+            </el-select>
+          </el-form-item>
+
           <el-form-item label="规格图片" prop="picUrl">
-            <el-upload
-              :action="uploadPath"
-              :show-file-list="false"
-              :headers="headers"
-              :on-success="uploadSpecPicUrl"
-              class="avatar-uploader"
-              accept=".jpg,.jpeg,.png,.gif">
+            <el-upload :action="uploadPath" :show-file-list="false" :headers="headers" :on-success="uploadSpecPicUrl" class="avatar-uploader" accept=".jpg,.jpeg,.png,.gif">
               <img v-if="specForm.picUrl" :src="specForm.picUrl" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"/>
             </el-upload>
@@ -184,68 +247,12 @@
       </el-dialog>
     </el-card>
 
-    <el-card class="box-card">
-      <h3>商品库存</h3>
-      <el-table :data="products">
-        <el-table-column property="value" label="货品规格">
-          <template slot-scope="scope">
-            <el-tag v-for="tag in scope.row.specifications" :key="tag">
-              {{ tag }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column property="price" width="100" label="货品售价"/>
-        <el-table-column property="number" width="100" label="货品数量"/>
-        <el-table-column property="url" width="100" label="货品图片">
-          <template slot-scope="scope">
-            <img v-if="scope.row.url" :src="scope.row.url" width="40">
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="操作" width="100" class-name="small-padding fixed-width">
-          <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="handleProductShow(scope.row)">设置</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
 
-      <el-dialog :visible.sync="productVisiable" title="设置货品">
-        <el-form
-          ref="productForm"
-          :model="productForm"
-          status-icon
-          label-position="left"
-          label-width="100px"
-          style="width: 400px; margin-left:50px;">
-          <el-form-item label="货品规格列" prop="specifications">
-            <el-tag v-for="tag in productForm.specifications" :key="tag">
-              {{ tag }}
-            </el-tag>
-          </el-form-item>
-          <el-form-item label="货品售价" prop="price">
-            <el-input v-model="productForm.price" maxlength="7"/>
-          </el-form-item>
-          <el-form-item label="货品数量" prop="number">
-            <el-input v-model="productForm.number" maxlength="7"/>
-          </el-form-item>
-          <el-form-item label="货品图片" prop="url">
-            <el-upload
-              :action="uploadPath"
-              :show-file-list="false"
-              :headers="headers"
-              :on-success="uploadProductUrl"
-              class="avatar-uploader"
-              accept=".jpg,.jpeg,.png,.gif">
-              <img v-if="productForm.url" :src="productForm.url" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"/>
-            </el-upload>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="productVisiable = false">取消</el-button>
-          <el-button type="primary" @click="handleProductEdit">确定</el-button>
-        </div>
-      </el-dialog>
-    </el-card>
+
+
+
+
+
 
     <el-card class="box-card">
       <h3>商品参数</h3>
@@ -261,13 +268,7 @@
       </el-table>
 
       <el-dialog :visible.sync="attributeVisiable" title="设置商品参数">
-        <el-form
-          ref="attributeForm"
-          :model="attributeForm"
-          status-icon
-          label-position="left"
-          label-width="100px"
-          style="width: 400px; margin-left:50px;">
+        <el-form ref="attributeForm" :model="attributeForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
           <el-form-item label="商品参数名称" prop="attribute">
             <el-input v-model="attributeForm.attribute" maxlength="7"/>
           </el-form-item>
@@ -356,12 +357,20 @@ export default {
       brandList: [],
       goods: { picUrl: '', gallery: [] },
       specVisiable: false,
-      specForm: { specification: '', value: '', picUrl: '' },
+      disabledFlag:false,
+      specForm: {
+        specification:null,
+        value:null,
+        counterPrice: 0,
+        onePrice:0,
+        twoPrice:0,
+        threePrice:0,
+        isDefault:0,
+        number: 0
+      },
       multipleSpec: false,
-      specifications: [{ specification: '规格', value: '标准', picUrl: '' }],
+      specifications: [],
       productVisiable: false,
-      productForm: { id: 0, specifications: [], price: 0.00, number: 0, url: '' },
-      products: [{ id: 0, specifications: ['标准'], price: 0.00, number: 0, url: '' }],
       attributeVisiable: false,
       attributeForm: { attribute: '', value: '' },
       attributes: [],
@@ -411,24 +420,62 @@ export default {
       this.$router.push({ path: '/goods/goods' })
     },
     handlePublish: function() {
-      const finalGoods = {
-        goods: this.goods,
-        specifications: this.specifications,
-        products: this.products,
-        attributes: this.attributes
+      let data = this.goods
+      if (data.isNew == null){
+        this.$message.warning("是否新品请选择")
+      }else if (data.isHot == null ){
+        this.$message.warning("是否热卖请选择")
+      }else if (data.onePrice == null ||  data.onePrice <= 0 ){
+        this.$message.warning("一类价格必须大于0")
+      }else if (data.twoPrice == null ||data.twoPrice <= 0){
+        this.$message.warning("二类价格必须大于0")
+      }else if (data.threePrice == null ||data.threePrice <= 0){
+        this.$message.warning("三类价格必须大于0")
+      }else if (data.counterPrice == null ||data.counterPrice <= 0){
+        this.$message.warning("专柜价格必须大于0")
+      }else if (data.isOnSale == null){
+        this.$message.warning("是否在售请选择")
+      }else if (data.picUrl == null ||  data.picUrl == ""){
+        this.$message.warning("商品图片请选择")
+      }else if (data.unit == null ||  data.unit == ""){
+        this.$message.warning("商品单位不能为空")
+      }else if (data.gallery == null ||  data.gallery.length <1){
+        this.$message.warning("宣传画廊请选择")
+      }else if (data.categoryId == null ){
+        this.$message.warning("商品类别请选择")
+      }else{
+        var num = 0
+        this.specifications.forEach(item =>{
+          if (item.isDefault == 1){
+            num ++
+          }
+        })
+        if (num == 0){
+          this.$message.warning("必须指定一个默认规格")
+          return
+        }else if (num >1) {
+          this.$message.warning("只能指定一个默认规格")
+          return
+        }
+        const finalGoods = {
+          goods: this.goods,
+          specifications: this.specifications,
+          attributes: this.attributes
+        }
+        publishGoods(finalGoods).then(response => {
+          this.$notify.success({
+            title: '成功',
+            message: '创建成功'
+          })
+          this.$router.push({ path: '/goods/list' })
+        }).catch(response => {
+          MessageBox.alert('业务错误：' + response.data.errmsg, '警告', {
+            confirmButtonText: '确定',
+            type: 'error'
+          })
+        })
       }
-      publishGoods(finalGoods).then(response => {
-        this.$notify.success({
-          title: '成功',
-          message: '创建成功'
-        })
-        this.$router.push({ path: '/goods/list' })
-      }).catch(response => {
-        MessageBox.alert('业务错误：' + response.data.errmsg, '警告', {
-          confirmButtonText: '确定',
-          type: 'error'
-        })
-      })
+
     },
     handleClose(tag) {
       this.keywords.splice(this.keywords.indexOf(tag), 1)
@@ -498,28 +545,56 @@ export default {
       this.specVisiable = true
     },
     handleSpecificationAdd() {
-      var index = this.specifications.length - 1
-      for (var i = 0; i < this.specifications.length; i++) {
-        const v = this.specifications[i]
-        if (v.specification === this.specForm.specification) {
-          if (v.value === this.specForm.value) {
-            this.$message({
-              type: 'warning',
-              message: '已经存在规格值:' + v.value
-            })
-            this.specForm = {}
-            this.specVisiable = false
-            return
-          } else {
-            index = i
+      let data = this.specForm
+      if (data.specification == "" || data.specification == null){
+        this.$message.warning("规格名不能为空")
+      }else if (data.value == "" || data.value == null){
+        this.$message.warning("规格值不能为空")
+      }else if (data.onePrice == null ||data.onePrice <= 0){
+        this.$message.warning("一类价格必须大于0")
+      }else if (data.twoPrice == null ||data.twoPrice <= 0){
+        this.$message.warning("二类价格必须大于0")
+      }else if (data.threePrice == null ||data.threePrice <= 0){
+        this.$message.warning("三类价格必须大于0")
+      }else if (data.counterPrice == null ||data.counterPrice <= 0){
+        this.$message.warning("专柜价格必须大于0")
+      }else if (data.number == null ||data.number < 1){
+        this.$message.warning("库存数量必须大于0")
+      }else{
+        var index = this.specifications.length - 1
+        for (var i = 0; i < this.specifications.length; i++) {
+          const v = this.specifications[i]
+          if (v.specification === this.specForm.specification) {
+            if (v.value === this.specForm.value) {
+              this.$message({
+                type: 'warning',
+                message: '已经存在规格值:' + v.value
+              })
+              this.specForm = {
+                specification:null,
+                value:null,
+                counterPrice: 0,
+                onePrice:0,
+                twoPrice:0,
+                threePrice:0,
+                isDefault:0,
+                number: 0
+              }
+              this.disabledFlag = false
+              this.specVisiable = false
+              return
+            } else {
+              index = i
+            }
           }
         }
+
+        this.specifications.splice(index + 1, 0, this.specForm)
+        this.specVisiable = false
+
+        this.specToProduct()
       }
 
-      this.specifications.splice(index + 1, 0, this.specForm)
-      this.specVisiable = false
-
-      this.specToProduct()
     },
     handleSpecificationDelete(row) {
       const index = this.specifications.indexOf(row)
@@ -619,6 +694,22 @@ export default {
     handleAttributeDelete(row) {
       const index = this.attributes.indexOf(row)
       this.attributes.splice(index, 1)
+    },
+    changeDefault(){
+      if (this.specForm.isDefault == 1){
+
+        this.specForm.counterPrice = this.goods.counterPrice
+        this.specForm.onePrice = this.goods.onePrice
+        this.specForm.twoPrice = this.goods.twoPrice
+        this.specForm.threePrice = this.goods.threePrice
+        this.disabledFlag = true
+      }else{
+        this.specForm.counterPrice = 0
+        this.specForm.onePrice = 0
+        this.specForm.twoPrice = 0
+        this.specForm.threePrice = 0
+        this.disabledFlag = false
+      }
     }
   }
 }
