@@ -260,6 +260,16 @@ export const asyncRouterMap = [
           noCache: true
         }
       },
+      {
+        path: 'direct',
+        component: () => import('@/views/promotion/direct'),
+        name: 'direct',
+        meta: {
+          perms: ['GET /admin/direct/list','POST /admin/direct/create','POST /admin/direct/update','POST /admin/direct/delete'],
+          title: '直通车设置',
+          noCache: true
+        }
+      },
       // {
       //   path: 'coupon',
       //   component: () => import('@/views/promotion/coupon'),

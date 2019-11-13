@@ -71,10 +71,6 @@
         </el-form-item>
 
 
-        <el-form-item label="跳转链接" prop="link">
-          <el-input v-model="dataForm.link"/>
-        </el-form-item>
-
 
 
         <el-form-item label="是否启用" prop="enabled">
@@ -99,12 +95,13 @@
 
     <el-dialog title="图片设置" :visible.sync="slideshowVisible">
       <el-carousel indicator-position="outside" trigger="click" v-if="fileList.length > 1">
-        <el-carousel-item v-for="item in fileList"  :key="item.url">
+        <el-carousel-item v-for="(item,index) in fileList"  :key="item.url">
+          <el-input :value="linkList[index]" v-model="linkList[index]" placeholder="请输入此张图片的跳转链接" @input="$forceUpdate()"/>
           <img :src="item.url"  style="width:100%;height: 100%"/>
         </el-carousel-item>
       </el-carousel>
+      <el-input :value="linkList[0]" v-model="linkList[0]" placeholder="请输入此张图片的跳转链接" v-if="fileList.length == 1" />
       <img :src="fileList[0].url"  style="width:100%;height: 300px;" v-if="fileList.length == 1"/>
-
       <el-badge :value="fileList.length" class="item">
         <el-upload  ref="uploadFile"
                     :disabled="disabledFlag"
@@ -174,6 +171,7 @@ export default {
       listLoading: true,
       positionChinese:['轮播图','底位1','底位2','底位3'],
       fileList:[],
+      linkList:[],
       idCache: undefined,
       slideshowVisible: false,
       disabledFlag: false,
@@ -262,8 +260,8 @@ export default {
     },
     createData() {
       this.$refs['dataForm'].validate(valid => {
-        if (this.dataForm.url == "" || this.dataForm.url == null || this.dataForm.url == undefined){
-          this.$message.warning('图片必须选择一张')
+        this.toLink()
+        if (!this.verify()){
           return
         }
         if (valid) {
@@ -286,7 +284,7 @@ export default {
             })
           this.$refs.uploadFile.clearFiles()
           this.fileList = []
-
+          this.linkList = []
         }
 
       })
@@ -303,8 +301,8 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          if (this.dataForm.url == "" || this.dataForm.url == null || this.dataForm.url == undefined){
-            this.$message.warning('图片必须选择一张')
+          this.toLink()
+          if (!this.verify()){
             return
           }
           updateAd(this.dataForm)
@@ -330,7 +328,9 @@ export default {
               })
               this.getList()
             })
-
+          this.$refs.uploadFile.clearFiles()
+          this.fileList = []
+          this.linkList = []
         }
       })
     },
@@ -352,21 +352,18 @@ export default {
         })
     },
     handleDownload() {
+      this.list.forEach(item =>{
+        item.position = this.positionChinese[item.position]
+      })
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
         const tHeader = [
-          '广告ID',
-          '广告标题',
-          '广告内容',
-          '广告图片',
-          '广告位置',
+          '图片',
+          '位置',
           '活动链接',
           '是否启用'
         ]
         const filterVal = [
-          'id',
-          'name',
-          'content',
           'url',
           'postion',
           'link',
@@ -396,6 +393,11 @@ export default {
       this.fileList = fileList
     },
     removeFile(file, fileList){
+      for (let i = 0; i < this.fileList.length; i++) {
+        if (this.fileList[i].url == file.url){
+          this.linkList.splice(i,1)
+        }
+      }
       if (fileList.length > 0){
         this.dataForm.url = fileList[0].url
         for (let i = 1; i <fileList.length; i++) {
@@ -413,7 +415,6 @@ export default {
       }else{
         this.dataForm.url += ","+response.data.url
       }
-
     },
     submitError(error, file, fileList){
       this.$message.error('上传失败：'+error)
@@ -425,6 +426,9 @@ export default {
         if (item.id ==this.idCache && !this.isUrl(item.urlList) && this.dialogStatus =='update' && !this.deleteFlag){
           item.urlList.forEach(url =>{
             this.fileList.push({'name':item.name,'url':url})
+          })
+          item.linkList.forEach(link =>{
+            this.linkList.push(link)
           })
         }
 
@@ -439,9 +443,30 @@ export default {
       }
     },
     closeFrom(done){
-      console.log(1)
+      this.linkList = []
       this.fileList = []
       this.dialogFormVisible = false
+    },
+    toLink(){
+      if (this.linkList != null && this.linkList.length != 0){
+        this.dataForm.link = ""
+        this.dataForm.link = this.linkList[0]
+        for (let i = 1; i < this.linkList.length; i++) {
+          this.dataForm.link += ","+this.linkList[i]
+        }
+      }
+
+    },
+    verify(){
+      if (this.dataForm.url == "" || this.dataForm.url == null || this.dataForm.url == undefined){
+        this.$message.warning('图片必须选择一张')
+        return false
+      }
+      if (this.dataForm.link == "" || this.dataForm.link == null || this.dataForm.link == undefined){
+        this.$message.warning('url必须输入')
+        return false
+      }
+      return true
     }
   }
 }
