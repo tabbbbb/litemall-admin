@@ -281,9 +281,9 @@
       </el-table>
 
       <el-dialog :visible.sync="attributeVisiable" title="设置商品参数">
-        <el-form ref="attributeForm" :model="attributeForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form ref="attributeForm" v-model="attributeForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
           <el-form-item label="商品参数名称" prop="attribute">
-            <el-input v-model="attributeForm.attribute" maxlength="7"/>
+            <el-input v-model="attributeForm.attribute" maxlength="7" :disabled="disabledAttr"/>
           </el-form-item>
           <el-form-item label="商品参数值" prop="value">
             <el-input v-model="attributeForm.value" maxlength="7"/>
@@ -365,6 +365,7 @@ export default {
       uploadPath,
       newKeywordVisible: false,
       newKeyword: '',
+      disabledAttr: false,
       regionList:[],
       keywords: [],
       categoryList: [],
@@ -462,8 +463,8 @@ export default {
         this.$message.warning("宣传画廊请选择")
       }else if (data.categoryId == null ){
         this.$message.warning("商品类别请选择")
-      }else if(this.attributes.length !=  4){
-        this.$message.warning("商品参数只能设置4个")
+      }else if(this.attributes.length <  4){
+        this.$message.warning("商品参数不能小于4")
       }else{
         var num = 0
         this.specifications.forEach(item =>{
@@ -714,10 +715,31 @@ export default {
     handleAttributeShow() {
       this.attributeForm = {}
       this.attributeVisiable = true
+      var length = this.attributes.length
+      var name = null
+      if (length == 0){
+        name = "规格"
+        console.log(1)
+        this.disabledAttr = true
+      } else if (length == 1){
+        name = "产地"
+        this.disabledAttr = true
+      } else if (length == 2){
+        name = "毛重"
+        this.disabledAttr = true
+      }else if (length == 3){
+        name = "净重"
+        this.disabledAttr = true
+      }else{
+        this.disabledAttr = false
+      }
+      this.attributeForm = {"attribute":name}
+      console.log(this.attributeForm)
     },
     handleAttributeAdd() {
       this.attributes.unshift(this.attributeForm)
       this.attributeVisiable = false
+      this.disabledAttr = false
     },
     handleAttributeDelete(row) {
       const index = this.attributes.indexOf(row)
