@@ -21,6 +21,20 @@ export function listExpress() {
     method: 'get'
   })
 }
+export function listDown() {
+  return request({
+    url: '/config/down',
+    method: 'get'
+  })
+}
+export function updateDown(data) {
+  return request({
+    url: '/config/down',
+    method: 'post',
+    data
+  })
+}
+
 
 export function updateExpress(data) {
   return request({

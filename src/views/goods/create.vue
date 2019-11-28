@@ -3,7 +3,7 @@
 
     <el-card class="box-card">
       <h3>商品介绍</h3>
-      <el-form ref="goods" :rules="rules" :model="goods" label-width="150px">
+      <el-form ref="goods"  v-model="goods" label-width="150px">
         <el-form-item label="商品编号" prop="goodsSn">
           <el-input
             v-model="goods.goodsSn"
@@ -13,22 +13,22 @@
           <el-input v-model="goods.name"/>
         </el-form-item>
         <el-form-item label="专柜价格" prop="counterPrice">
-          <el-input v-model.number="goods.counterPrice" maxlength="7" placeholder="0.00">
+          <el-input type="number" v-model="goods.counterPrice" maxlength="7" placeholder="0.00">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
-        <el-form-item label="一类价格" prop="counterPrice">
-          <el-input v-model.number="goods.onePrice" maxlength="7" placeholder="0.00">
+        <el-form-item label="一类价格" prop="onePrice">
+          <el-input type="number" v-model="goods.onePrice" maxlength="7" placeholder="0.00">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
-        <el-form-item label="二类价格" prop="counterPrice">
-          <el-input v-model.number="goods.twoPrice" maxlength="7" placeholder="0.00">
+        <el-form-item label="二类价格" prop="twoPrice">
+          <el-input type="number" v-model="goods.twoPrice" maxlength="7" placeholder="0.00">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
-        <el-form-item label="三类价格" prop="counterPrice">
-          <el-input v-model.number="goods.threePrice" maxlength="7" placeholder="0.00">
+        <el-form-item label="三类价格" prop="threePrice">
+          <el-input type="number" v-model="goods.threePrice" maxlength="7" placeholder="0.00">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
@@ -52,6 +52,12 @@
             <el-radio :label="false">未售</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="是否特价" prop="isOnSale">
+          <el-radio-group v-model="goods.isSale">
+            <el-radio :label="true">特价</el-radio>
+            <el-radio :label="false">非特价</el-radio>
+          </el-radio-group>
+        </el-form-item>
 
         <el-form-item label="商品图片">
           <el-upload
@@ -64,6 +70,7 @@
             <img v-if="goods.picUrl" :src="goods.picUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
           </el-upload>
+          <p style="color: red;">图片最佳尺寸为200px*120px</p>
         </el-form-item>
 
         <el-form-item label="宣传画廊">
@@ -79,30 +86,36 @@
             list-type="picture-card">
             <i class="el-icon-plus"/>
           </el-upload>
+          <p style="color: red;">图片最佳尺寸为375px*260px</p>
         </el-form-item>
 
         <el-form-item label="商品单位">
           <el-input v-model="goods.unit" maxlength="7" placeholder="件 / 个 / 盒"/>
         </el-form-item>
 
-        <el-form-item label="关键字">
-          <el-tag v-for="tag in keywords" :key="tag" closable type="primary" @close="handleClose(tag)">
-            {{ tag }}
-          </el-tag>
-          <el-input
-            v-if="newKeywordVisible"
-            ref="newKeywordInput"
-            v-model="newKeyword"
-            maxlength="7"
-            class="input-new-keyword"
+        <!--<el-form-item label="关键字">-->
+          <!--<el-tag v-for="tag in keywords" :key="tag" closable type="primary" @close="handleClose(tag)">-->
+            <!--{{ tag }}-->
+          <!--</el-tag>-->
+          <!--<el-input-->
+            <!--v-if="newKeywordVisible"-->
+            <!--ref="newKeywordInput"-->
+            <!--v-model="newKeyword"-->
+            <!--maxlength="7"-->
+            <!--class="input-new-keyword"-->
 
-            @keyup.enter.native="handleInputConfirm"
-            @blur="handleInputConfirm"/>
-          <el-button v-else class="button-new-keyword" type="primary" @click="showInput">+ 增加</el-button>
-        </el-form-item>
+            <!--@keyup.enter.native="handleInputConfirm"-->
+            <!--@blur="handleInputConfirm"/>-->
+          <!--<el-button v-else class="button-new-keyword" type="primary" @click="showInput">+ 增加</el-button>-->
+        <!--</el-form-item>-->
 
         <el-form-item label="所属分类">
           <el-cascader :options="categoryList" expand-trigger="hover" @change="handleCategoryChange"/>
+        </el-form-item>
+
+
+        <el-form-item label="产地">
+          <el-cascader :options="regionList" expand-trigger="hover"  change-on-select v-model="selecedAddress"  @change="handleChange" />
         </el-form-item>
 
 
@@ -177,7 +190,7 @@
       </el-table>
 
       <el-dialog :visible.sync="specVisiable" title="设置规格">
-        <el-form ref="specForm" :rules="rules" :model="specForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form ref="specForm" :rules="rules" v-model="specForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
 
 
           <el-form-item label="规格名" prop="specification">
@@ -195,7 +208,7 @@
 
 
           <el-form-item label="专柜价格">
-            <el-input v-model.number="specForm.counterPrice" maxlength="7" placeholder="0.00" :disabled="disabledFlag">
+            <el-input type="number" v-model="specForm.counterPrice" maxlength="7" placeholder="0.00" :disabled="disabledFlag" >
               <template slot="append">元</template>
             </el-input>
           </el-form-item>
@@ -203,7 +216,7 @@
 
 
           <el-form-item label="一类价格" >
-            <el-input v-model.number="specForm.onePrice" maxlength="7" placeholder="0.00"  :disabled="disabledFlag">
+            <el-input type="number" v-model="specForm.onePrice" maxlength="7" placeholder="0.00"  :disabled="disabledFlag">
               <template slot="append">元</template>
             </el-input>
           </el-form-item>
@@ -211,7 +224,7 @@
 
 
           <el-form-item label="二类价格" >
-            <el-input v-model.number="specForm.twoPrice" maxlength="7" placeholder="0.00" :disabled="disabledFlag" >
+            <el-input type="number" v-model="specForm.twoPrice" maxlength="7" placeholder="0.00" :disabled="disabledFlag" >
               <template slot="append">元</template>
             </el-input>
           </el-form-item>
@@ -219,7 +232,7 @@
 
 
           <el-form-item label="三类价格">
-            <el-input v-model.number="specForm.threePrice" maxlength="7" placeholder="0.00"  :disabled="disabledFlag" >
+            <el-input type="number" v-model="specForm.threePrice" maxlength="7" placeholder="0.00"  :disabled="disabledFlag" >
               <template slot="append">元</template>
             </el-input>
           </el-form-item>
@@ -337,7 +350,7 @@
 </style>
 
 <script>
-import { publishGoods, listCatAndBrand } from '@/api/goods'
+import { publishGoods, listCatAndBrand ,listRegion} from '@/api/goods'
 import { createStorage, uploadPath } from '@/api/storage'
 import Editor from '@tinymce/tinymce-vue'
 import { MessageBox } from 'element-ui'
@@ -352,12 +365,14 @@ export default {
       uploadPath,
       newKeywordVisible: false,
       newKeyword: '',
+      regionList:[],
       keywords: [],
       categoryList: [],
       brandList: [],
-      goods: { picUrl: '', gallery: [] },
+      goods: { picUrl: '', gallery: []},
       specVisiable: false,
       disabledFlag:false,
+      selecedAddress:[],
       specForm: {
         specification:null,
         value:null,
@@ -374,10 +389,6 @@ export default {
       attributeVisiable: false,
       attributeForm: { attribute: '', value: '' },
       attributes: [],
-      rules: {
-        goodsSn: [{ required: true, message: '商品编号不能为空', trigger: 'blur' }],
-        name: [{ required: true, message: '商品名称不能为空', trigger: 'blur' }]
-      },
       editorInit: {
         language: 'zh_CN',
         convert_urls: false,
@@ -412,6 +423,10 @@ export default {
         this.categoryList = response.data.data.categoryList
         this.brandList = response.data.data.brandList
       })
+      listRegion().then(response => {
+        console.log(response)
+        this.regionList = response.data.data
+      })
     },
     handleCategoryChange(value) {
       this.goods.categoryId = value[value.length - 1]
@@ -421,7 +436,11 @@ export default {
     },
     handlePublish: function() {
       let data = this.goods
-      if (data.isNew == null){
+      if (data.goodsSn == null || data.goodsSn == "" || data.goodsSn == undefined){
+        this.$message.warning("输入商品编号")
+      } else if (data.name == null || data.name == "" || data.name == undefined){
+        this.$message.warning("商品名称不能为空")
+      }else if (data.isNew == null){
         this.$message.warning("是否新品请选择")
       }else if (data.isHot == null ){
         this.$message.warning("是否热卖请选择")
@@ -456,6 +475,13 @@ export default {
         }else if (num >1) {
           this.$message.warning("只能指定一个默认规格")
           return
+        }
+        if (this.selecedAddress[0] != null){
+          this.goods.provinceId = this.selecedAddress[0]
+        }else if(this.selecedAddress[1] != null){
+          this.goods.cityId = this.selecedAddress[1]
+        }else if(this.selecedAddress[2] != null){
+          this.goods.areaId = this.selecedAddress[2]
         }
         const finalGoods = {
           goods: this.goods,
@@ -710,6 +736,10 @@ export default {
         this.specForm.threePrice = 0
         this.disabledFlag = false
       }
+    },
+    handleChange(value){
+      console.log(value)
+      console.log(this.selecedAddress)
     }
   }
 }

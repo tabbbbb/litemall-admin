@@ -46,3 +46,11 @@ export function listCatAndBrand() {
     method: 'get'
   })
 }
+
+export function listRegion() {
+  return request({
+    url: '/goods/region',
+    method: 'get'
+  })
+}
+

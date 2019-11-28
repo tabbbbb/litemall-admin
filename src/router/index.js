@@ -171,16 +171,6 @@ export const asyncRouterMap = [
           title: '通用问题',
           noCache: true
         }
-      },
-      {
-        path: 'keyword',
-        component: () => import('@/views/mall/keyword'),
-        name: 'keyword',
-        meta: {
-          perms: ['GET /admin/keyword/list', 'POST /admin/keyword/create', 'GET /admin/keyword/read', 'POST /admin/keyword/update', 'POST /admin/keyword/delete'],
-          title: '关键词',
-          noCache: true
-        }
       }
     ]
   },
@@ -387,6 +377,16 @@ export const asyncRouterMap = [
         meta: {
           perms: ['GET /admin/config/express', 'POST /admin/config/express'],
           title: '运费配置',
+          noCache: true
+        }
+      },
+      {
+        path: 'down',
+        component: () => import('@/views/config/down'),
+        name: 'configExpress',
+        meta: {
+          perms: ['GET /admin/config/down', 'POST /admin/config/down'],
+          title: '定金配置',
           noCache: true
         }
       },

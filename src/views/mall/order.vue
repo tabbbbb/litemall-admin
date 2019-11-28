@@ -33,15 +33,13 @@
 
       <el-table-column align="center" label="支付时间" prop="payTime"/>
 
-      <el-table-column align="center" label="物流单号" prop="shipSn"/>
-
-      <el-table-column align="center" label="物流渠道" prop="shipChannel"/>
 
       <el-table-column align="center" label="操作" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button v-permission="['GET /admin/order/detail']" type="primary" size="mini" @click="handleDetail(scope.row)">详情</el-button>
           <el-button v-permission="['POST /admin/order/ship']" v-if="scope.row.orderStatus==201" type="primary" size="mini" @click="handleShip(scope.row)">发货</el-button>
           <el-button v-permission="['POST /admin/order/refund']" v-if="scope.row.orderStatus==202" type="primary" size="mini" @click="handleRefund(scope.row)">退款</el-button>
+          <el-button v-permission="['POST /admin/order/notarize']" v-if="scope.row.orderStatus== 301" type="primary" size="mini" @click="showNotarize(scope.row)">收货</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -72,13 +70,16 @@
         <el-form-item label="商品信息">
           <el-table :data="orderDetail.orderGoods" border fit highlight-current-row>
             <el-table-column align="center" label="商品名称" prop="goodsName" />
-            <el-table-column align="center" label="商品编号" prop="goodsSn" />
-            <el-table-column align="center" label="货品规格" prop="specifications" />
+            <el-table-column align="center" label="货品规格" prop="specName" >
+              <template slot-scope="scope">
+                <el-tag>{{scope.row.specName}}</el-tag>
+              </template>
+            </el-table-column>
             <el-table-column align="center" label="货品价格" prop="price" />
             <el-table-column align="center" label="货品数量" prop="number" />
-            <el-table-column align="center" label="货品图片" prop="picUrl">
+            <el-table-column align="center" label="货品图片" prop="pic">
               <template slot-scope="scope">
-                <img :src="scope.row.picUrl" width="40">
+                <img :src="scope.row.pic" width="40">
               </template>
             </el-table-column>
           </el-table>
@@ -87,9 +88,7 @@
           <span>
             (实际费用){{ orderDetail.order.actualPrice }}元 =
             (商品总价){{ orderDetail.order.goodsPrice }}元 +
-            (快递费用){{ orderDetail.order.freightPrice }}元 -
-            (优惠减免){{ orderDetail.order.couponPrice }}元 -
-            (积分减免){{ orderDetail.order.integralPrice }}元
+            (快递费用){{ orderDetail.order.freightPrice }}元
           </span>
         </el-form-item>
         <el-form-item label="支付信息">
@@ -97,8 +96,6 @@
           <span>（支付时间）{{ orderDetail.order.payTime }}</span>
         </el-form-item>
         <el-form-item label="快递信息">
-          <span>（快递公司）{{ orderDetail.order.shipChannel }}</span>
-          <span>（快递单号）{{ orderDetail.order.shipSn }}</span>
           <span>（发货时间）{{ orderDetail.order.shipTime }}</span>
         </el-form-item>
         <el-form-item label="收货信息">
@@ -109,14 +106,7 @@
 
     <!-- 发货对话框 -->
     <el-dialog :visible.sync="shipDialogVisible" title="发货">
-      <el-form ref="shipForm" :model="shipForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="快递公司" prop="shipChannel">
-          <el-input v-model="shipForm.shipChannel"/>
-        </el-form-item>
-        <el-form-item label="快递编号" prop="shipSn">
-          <el-input v-model="shipForm.shipSn"/>
-        </el-form-item>
-      </el-form>
+      <p>确认发货吗？</p>
       <div slot="footer" class="dialog-footer">
         <el-button @click="shipDialogVisible = false">取消</el-button>
         <el-button type="primary" @click="confirmShip">确定</el-button>
@@ -136,6 +126,19 @@
       </div>
     </el-dialog>
 
+    <!-- 退款对话框 -->
+    <el-dialog :visible.sync="notarizeDialogVisible" title="用户收货">
+      <el-form ref="notarizeForm" v-model="notarizeForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="实付金额" prop="notarizeMoney">
+          <el-input v-model="notarizeForm.notarizeMoney" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="notarizeDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="notarize">确定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -144,7 +147,7 @@
 </style>
 
 <script>
-import { listOrder, shipOrder, refundOrder, detailOrder,detailList } from '@/api/order'
+import { listOrder, shipOrder, refundOrder, detailOrder,detailList,notarize} from '@/api/order'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import checkPermission from '@/utils/permission' // 权限判断函数
 
@@ -156,8 +159,7 @@ const statusMap = {
   202: '申请退款',
   203: '已退款',
   301: '已发货',
-  401: '用户收货',
-  402: '系统收货'
+  401: '用户收货'
 }
 
 export default {
@@ -172,6 +174,7 @@ export default {
     return {
       list: null,
       total: 0,
+      notarizeDialogVisible:false,
       listLoading: true,
       downList:null,
       listQuery: {
@@ -199,6 +202,10 @@ export default {
       refundForm: {
         orderId: undefined,
         refundMoney: undefined
+      },
+      notarizeForm:{
+        orderId: undefined,
+        notarizeMoney: undefined
       },
       refundDialogVisible: false,
       downloadLoading: false
@@ -233,8 +240,6 @@ export default {
     },
     handleShip(row) {
       this.shipForm.orderId = row.id
-      this.shipForm.shipChannel = row.shipChannel
-      this.shipForm.shipSn = row.shipSn
 
       this.shipDialogVisible = true
       this.$nextTick(() => {
@@ -242,22 +247,18 @@ export default {
       })
     },
     confirmShip() {
-      this.$refs['shipForm'].validate((valid) => {
-        if (valid) {
-          shipOrder(this.shipForm).then(response => {
-            this.shipDialogVisible = false
-            this.$notify.success({
-              title: '成功',
-              message: '确认发货成功'
-            })
-            this.getList()
-          }).catch(response => {
-            this.$notify.error({
-              title: '失败',
-              message: response.data.errmsg
-            })
-          })
-        }
+      shipOrder(this.shipForm).then(response => {
+        this.shipDialogVisible = false
+        this.$notify.success({
+          title: '成功',
+          message: '确认发货成功'
+        })
+        this.getList()
+      }).catch(response => {
+        this.$notify.error({
+          title: '失败',
+          message: response.data.errmsg
+        })
       })
     },
     handleRefund(row) {
@@ -335,10 +336,10 @@ export default {
               lin['id'+(j+1)] = orderGoods[j].id
               lin['number'+(j+1)] = orderGoods[j].number
               lin['orderId'+(j+1)] = orderGoods[j].orderId
-              lin['picUrl'+(j+1)] = orderGoods[j].picUrl
+              lin['pic'+(j+1)] = orderGoods[j].pic
               lin['price'+(j+1)] = orderGoods[j].price
               lin['productId'+(j+1)] = orderGoods[j].productId
-              lin['specifications'+(j+1)] = orderGoods[j].specifications
+              lin['specName'+(j+1)] = orderGoods[j].specName
               lin['updateTime'+(j+1)] = orderGoods[j].updateTime
 
             }
@@ -351,34 +352,26 @@ export default {
               import('@/vendor/Export2Excel').then(excel => {
                 const tHeader = [
                   '订单编号', '订单状态', '订单用户', '用户留言', '收货人',
-                  '收货人手机号', '收货地址','实际费用','商品总价','快递费用',
-                  '优惠减免','积分减免','支付渠道','支付时间','快递公司',
-                  '快递单号','发货时间','确认收货时间'
+                  '收货人手机号', '收货地址','实际费用','商品总价','快递费用'
+                  ,'支付渠道','支付时间','发货时间','确认收货时间'
                 ]
                 const filterVal = [
                   'orderSn', 'orderStatus', 'nickname', 'message', 'consignee',
-                  'mobile', 'address','actualPrice','goodsPrice','freightPrice',
-                  'couponPrice','integralPrice','qudao','payTime','shipChannel',
-                  'shipSn','shipTime','confirmTime'
+                  'mobile', 'address','orderPrice','goodsPrice','freightPrice',
+                  'qudao','payTime','shipTime','confirmTime'
                 ]
                 console.log(size)
                 for (let j = 0; j <size; j++) {
                   tHeader.push('商品名称'+(j+1))
-                  tHeader.push('商品编号'+(j+1))
-                  tHeader.push('货品规格'+(j+1))
-                  tHeader.push('货品价格'+(j+1))
-                  tHeader.push('货品数量'+(j+1))
-                  tHeader.push('货品图片'+(j+1))
+                  tHeader.push('商品规格'+(j+1))
+                  tHeader.push('商品价格'+(j+1))
+                  tHeader.push('商品数量'+(j+1))
                   filterVal.push('goodsName'+(j+1))
-                  filterVal.push('goodsId'+(j+1))
-                  filterVal.push('specifications'+(j+1))
+                  filterVal.push('specName'+(j+1))
                   filterVal.push('price'+(j+1))
                   filterVal.push('number'+(j+1))
-                  filterVal.push('picUrl'+(j+1))
-
                 }
-
-
+                console.log(lin)
                 excel.export_json_to_excel2(tHeader, this.downList, filterVal, '订单信息')
                 this.downloadLoading = false
               })
@@ -386,11 +379,32 @@ export default {
           }
         })
       }
-
-
-
-
-
+    },
+    showNotarize(row){
+      console.log(row)
+      this.notarizeForm.orderId = row.id
+      this.notarizeForm.notarizeMoney = row.orderPrice
+      this.notarizeDialogVisible = true
+      console.log(this.notarizeForm)
+    },
+    notarize(){
+      var flag =  confirm("确认吗？请认真核对价格，此后不能修改！")
+      if (flag){
+        notarize(this.notarizeForm)
+          .then(response =>{
+            this.$notify.success({
+              title: '成功',
+              message: '确认收货成功'
+            })
+            this.notarizeDialogVisible = false
+            this.getList()
+          }).catch(response =>{
+          this.$notify.error({
+            title: '失败',
+            message: response.data.errmsg
+          })
+        })
+      }
     }
   }
 }

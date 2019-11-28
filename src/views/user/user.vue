@@ -26,7 +26,7 @@
 
       <el-table-column align="center" label="用户等级" prop="userLevel">
         <template slot-scope="scope">
-          <el-tag >{{ levelDic[scope.row.userLevel-1] }}</el-tag>
+          <el-tag >{{ levelDic[levelId.indexOf(scope.row.userLevel)] }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="状态" prop="status">
@@ -162,8 +162,8 @@
         <!--<el-option v-for="(item,index) in levelDic" :key="index+1" :label="item" :value="index+1"/>-->
       <!--</el-select>-->
       <el-form ref="editValidateForm" :model="vipLevelUser">
-        <el-select v-model="vipLevelUser.level"  placeholder="请选择" @change="$forceUpdate()">
-        <el-option v-for="(item,index) in levelDic" :key="index+1" :label="item" :value="index+1"/>
+        <el-select v-model="vipLevelUser.userLevel"  placeholder="请选择" @change="$forceUpdate()">
+        <el-option v-for="item in levelList" :key="item.id" :label="item.vipType" :value="item.id"/>
         </el-select>
         <el-button type="primary" @click="updateUserLevel">确认修改</el-button>
 
@@ -210,6 +210,8 @@ export default {
       dialogVipLevelVisible : false,
       genderDic: ['未知', '男', '女'],
       levelDic: ['普通用户', 'VIP用户', '高级VIP用户'],
+      levelId:[],
+      levelList:null,
       statusDic: ['可用', '禁用', '注销'],
       listQuery: {
         page: 1,
@@ -254,9 +256,10 @@ export default {
   created() {
     this.levelDic = []
     listVip(null).then(response => {
-      console.log(response)
-      response.data.data.items.forEach(item =>{
+      this.levelList = response.data.data.items
+      this.levelList.forEach(item =>{
         this.levelDic.push(item.vipType)
+        this.levelId.push(item.id)
       })
     } )
     this.getList()
@@ -308,7 +311,8 @@ export default {
       this.list.forEach(item =>{
         item['genderChinese'] = this.genderDic[item.gender]
         item['statusChinese'] = this.statusDic[item.status]
-        item['levelChinese'] = this.levelDic[item.level]
+        item['levelChinese'] = this.levelDic[this.levelId.indexOf(item.userLevel)]
+        console.log(this.levelId.indexOf(item.userLevel))
       })
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
@@ -415,7 +419,7 @@ export default {
       this.dialogVipLevelVisible = true
       this.vipLevelUser['nickname'] = row.nickname
       this.vipLevelUser['id'] = row.id
-      this.vipLevelUser['level'] = row.userLevel
+      this.vipLevelUser['userLevel'] = row.userLevel
     },
     updateUserLevel(){
       updateUserLevel(this.vipLevelUser).then(response =>{

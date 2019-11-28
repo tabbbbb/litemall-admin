@@ -52,3 +52,11 @@ export function replyComment(data) {
     data
   })
 }
+export function notarize(data) {
+  return request({
+    url: '/order/notarize',
+    method: 'post',
+    data
+  })
+}
+

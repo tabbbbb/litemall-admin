@@ -16,18 +16,20 @@
       <el-table-column align="center" property="iconUrl" label="类目图标">
         <template slot-scope="scope">
           <img v-if="scope.row.iconUrl" :src="scope.row.iconUrl" width="40">
+          <el-tag type="info" v-if="!scope.row.iconUrl">无</el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" property="picUrl" label="类目图片">
+      <el-table-column align="center" label="类别状态" prop="status">
         <template slot-scope="scope">
-          <img v-if="scope.row.picUrl" :src="scope.row.picUrl" width="80">
+          <el-tag type="primary" v-if="scope.row.level == 'L1'">{{statusDic[scope.row.status]}}</el-tag>
+          <el-tag type="info" v-if="scope.row.level == 'L2'">无</el-tag>
         </template>
       </el-table-column>
+
 
       <el-table-column align="center" label="关键字" prop="keywords"/>
 
-      <el-table-column align="center" min-width="100" label="简介" prop="desc"/>
 
       <el-table-column align="center" label="级别" prop="level">
         <template slot-scope="scope">
@@ -54,16 +56,24 @@
         </el-form-item>
         <el-form-item label="级别" prop="level">
           <el-select v-model="dataForm.level" @change="onLevelChange">
-            <el-option label="一级类目" value="L1"/>
-            <el-option label="二级类目" value="L2"/>
+            <el-option label="一级类目" value="L1" key="L1" />
+            <el-option label="二级类目" value="L2"  key="L2"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dataForm.level === 'L2'" label="父类目" prop="pid">
+        <el-form-item label="类目状态" prop="status" v-if="dataForm.level =='L1'">
+          <el-select v-model="dataForm.status" >
+            <el-option label="热卖" :value="1"/>
+            <el-option label="新品" :value="2"/>
+            <el-option label="特价" :value="3"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="dataForm.level === 'L2'" label="父类目" prop="pid" >
           <el-select v-model="dataForm.pid">
             <el-option v-for="item in catL1" :key="item.value" :label="item.label" :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="类目图标" prop="iconUrl">
+
+        <el-form-item label="类目图标" prop="iconUrl" v-if="dataForm.level === 'L2'">
           <el-upload
             :headers="headers"
             :action="uploadPath"
@@ -74,22 +84,24 @@
             <img v-if="dataForm.iconUrl" :src="dataForm.iconUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
           </el-upload>
+          <p style="color: red;">最佳尺寸</p>
         </el-form-item>
-        <el-form-item label="类目图片" prop="picUrl">
+
+
+        <el-form-item label="类目页面展示图片" prop="iconUrl" v-if="dataForm.level === 'L1'">
           <el-upload
             :headers="headers"
             :action="uploadPath"
             :show-file-list="false"
-            :on-success="uploadPicUrl"
+            :on-success="uploadIconUrl"
             class="avatar-uploader"
             accept=".jpg,.jpeg,.png,.gif">
-            <img v-if="dataForm.picUrl" :src="dataForm.picUrl" class="avatar">
+            <img v-if="dataForm.iconUrl" :src="dataForm.iconUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
           </el-upload>
+          <p style="color: red;">最佳尺寸510px*200px</p>
         </el-form-item>
-        <el-form-item label="类目简介" prop="desc">
-          <el-input v-model="dataForm.desc"/>
-        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -150,11 +162,10 @@ export default {
         id: undefined,
         name: '',
         keywords: '',
-        level: 'L2',
+        level: 'L1',
+        status:0,
         pid: 0,
-        desc: '',
-        iconUrl: '',
-        picUrl: ''
+        iconUrl: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -162,6 +173,7 @@ export default {
         update: '编辑',
         create: '创建'
       },
+      statusDic:['普通','HOT','NEW','SALE'],
       rules: {
         name: [{ required: true, message: '类目名不能为空', trigger: 'blur' }]
       }
@@ -184,6 +196,7 @@ export default {
       listCategory()
         .then(response => {
           this.list = response.data.data
+          console.log(this.list)
           this.listLoading = false
         })
         .catch(() => {
@@ -201,7 +214,7 @@ export default {
         id: undefined,
         name: '',
         keywords: '',
-        level: 'L2',
+        level: 'L1',
         pid: 0,
         desc: '',
         iconUrl: '',
@@ -211,6 +224,10 @@ export default {
     onLevelChange: function(value) {
       if (value === 'L1') {
         this.dataForm.pid = 0
+      }else{
+        if (this.catL1 != null){
+          this.dataForm.pid = this.catL1[0].value
+        }
       }
     },
     handleCreate() {
@@ -252,6 +269,7 @@ export default {
     },
     handleUpdate(row) {
       this.dataForm = Object.assign({}, row)
+      console.log(this.dataForm)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
