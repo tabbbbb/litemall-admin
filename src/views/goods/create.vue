@@ -114,9 +114,9 @@
         </el-form-item>
 
 
-        <el-form-item label="产地">
-          <el-cascader :options="regionList" expand-trigger="hover"  change-on-select v-model="selecedAddress"  @change="handleChange" />
-        </el-form-item>
+        <!--<el-form-item label="产地">-->
+          <!--<el-cascader :options="regionList" expand-trigger="hover"  change-on-select v-model="selecedAddress"  @change="handleChange" />-->
+        <!--</el-form-item>-->
 
 
         <el-form-item label="商品简介">
@@ -190,7 +190,7 @@
       </el-table>
 
       <el-dialog :visible.sync="specVisiable" title="设置规格">
-        <el-form ref="specForm" :rules="rules" v-model="specForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form ref="specForm"  v-model="specForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
 
 
           <el-form-item label="规格名" prop="specification">
@@ -462,6 +462,8 @@ export default {
         this.$message.warning("宣传画廊请选择")
       }else if (data.categoryId == null ){
         this.$message.warning("商品类别请选择")
+      }else if(this.attributes.length !=  4){
+        this.$message.warning("商品参数只能设置4个")
       }else{
         var num = 0
         this.specifications.forEach(item =>{
