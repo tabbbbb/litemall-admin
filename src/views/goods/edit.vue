@@ -762,16 +762,16 @@ export default {
       this.attributeVisiable = true
       var length = this.attributes.length
       var name = null
-      if (length == 0){
+      if (length == 0 ||this.attributes[0].attribute != "规格" ){
         name = "规格"
         this.disabledAttr = true
-      } else if (length == 1){
+      } else if (length == 1 ||this.attributes[1].attribute != "产地" ){
         name = "产地"
         this.disabledAttr = true
-      } else if (length == 2){
+      } else if (length == 2 ||this.attributes[2].attribute != "毛重" ){
         name = "毛重"
         this.disabledAttr = true
-      }else if (length == 3){
+      }else if (length == 3 ||this.attributes[3].attribute != "净重" ){
         name = "净重"
         this.disabledAttr = true
       }else{
@@ -781,9 +781,33 @@ export default {
       console.log(this.attributeForm)
     },
     handleAttributeAdd() {
-      this.attributes.unshift(this.attributeForm)
+      if (this.attributes[0] != null && this.attributes[0].attribute != "规格" ){
+        this.insertArray(this.attributes,0,this.attributeForm)
+      } else if (this.attributes[1] != null && this.attributes[1].attribute != "产地" ){
+        this.insertArray(this.attributes,1,this.attributeForm)
+      } else if (this.attributes[2] != null && this.attributes[2].attribute != "毛重" ){
+        this.insertArray(this.attributes,2,this.attributeForm)
+      }else if (this.attributes[3] != null && this.attributes[3].attribute != "净重" ){
+        this.insertArray(this.attributes,3,this.attributeForm)
+      }else{
+        this.attributes.push(this.attributeForm)
+      }
       this.attributeVisiable = false
       this.disabledAttr = false
+    },
+    insertArray(array,index,value){
+      var length = array.length;
+      array[length] = null
+      for (let i = array.length-1; i >= 0; i--) {
+        if (i == index){
+          array[i] = value
+          console.log(array)
+          return
+        } else{
+          array[i] = array[i-1]
+        }
+      }
+
     },
     handleAttributeDelete(row) {
       const index = this.attributes.indexOf(row)
