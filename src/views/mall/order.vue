@@ -129,7 +129,11 @@
     <!-- 退款对话框 -->
     <el-dialog :visible.sync="notarizeDialogVisible" title="用户收货">
       <el-form ref="notarizeForm" v-model="notarizeForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="实付金额" prop="notarizeMoney">
+        <el-form-item label="订单金额(元)" prop="orderPrice">
+          <el-input v-model="notarizeForm.orderPrice"  disabled="true"/>
+        </el-form-item>
+
+        <el-form-item label="实付金额(元)" prop="notarizeMoney">
           <el-input v-model="notarizeForm.notarizeMoney" />
         </el-form-item>
       </el-form>
@@ -205,6 +209,7 @@ export default {
       },
       notarizeForm:{
         orderId: undefined,
+        orderPrice:undefined,
         notarizeMoney: undefined
       },
       refundDialogVisible: false,
@@ -383,6 +388,7 @@ export default {
     showNotarize(row){
       console.log(row)
       this.notarizeForm.orderId = row.id
+      this.notarizeForm.orderPrice = row.orderPrice
       this.notarizeForm.notarizeMoney = row.orderPrice
       this.notarizeDialogVisible = true
       console.log(this.notarizeForm)
