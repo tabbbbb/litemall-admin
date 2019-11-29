@@ -58,11 +58,11 @@
         </el-form-item>
         <el-form-item label="类目状态" prop="status" v-if="dataForm.level =='L1'">
           <el-select v-model="dataForm.status" >
+            <el-option label="普通" :value="0"/>
             <el-option label="热卖" :value="1"/>
             <el-option label="新品" :value="2"/>
             <el-option label="特价" :value="3"/>
           </el-select>
-          <p>不选择默认普通</p>
         </el-form-item>
         <el-form-item v-if="dataForm.level === 'L2'" label="父类目" prop="pid" >
           <el-select v-model="dataForm.pid">
