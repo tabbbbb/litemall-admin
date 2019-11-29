@@ -28,7 +28,6 @@
       </el-table-column>
 
 
-      <el-table-column align="center" label="关键字" prop="keywords"/>
 
 
       <el-table-column align="center" label="级别" prop="level">
@@ -51,9 +50,6 @@
         <el-form-item label="类目名称" prop="name">
           <el-input v-model="dataForm.name"/>
         </el-form-item>
-        <el-form-item label="关键字" prop="keywords">
-          <el-input v-model="dataForm.keywords"/>
-        </el-form-item>
         <el-form-item label="级别" prop="level">
           <el-select v-model="dataForm.level" @change="onLevelChange">
             <el-option label="一级类目" value="L1" key="L1" />
@@ -66,6 +62,7 @@
             <el-option label="新品" :value="2"/>
             <el-option label="特价" :value="3"/>
           </el-select>
+          <p>不选择默认普通</p>
         </el-form-item>
         <el-form-item v-if="dataForm.level === 'L2'" label="父类目" prop="pid" >
           <el-select v-model="dataForm.pid">
