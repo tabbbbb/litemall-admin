@@ -67,7 +67,7 @@
 
     <!-- 添加或修改对话框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :before-close="closeFrom">
-      <el-form ref="dataForm" :rules="rules" :model="dataForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" v-model="dataForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
 
         <el-form-item label="图片位置" prop="position">
           <el-select v-model="dataForm.position" placeholder="请选择" @change="changeName">
@@ -108,8 +108,8 @@
         </el-form-item>
 
 
-        <el-form-item  :label="item+'介绍'"  v-if="dataForm.position != 1 && (dataForm.name == '新品上市' || dataForm.name == '特价水果')" v-for="(item,index) in dataForm.linkList">
-          <el-input v-model="dataForm.urlList[index]"/>
+        <el-form-item   prop="content"  :label="item+'介绍'"  v-if="dataForm.position != 1 && (dataForm.name == '新品上市' || dataForm.name == '特价水果')" v-for="(item,index) in dataForm.linkList">
+          <el-input v-model="dataForm.urlList[index]" @input="$forceUpdate()"/>
         </el-form-item>
 
 
@@ -169,7 +169,7 @@
     <el-dialog :title="settingName" :visible.sync="goodsSwitchShow">
       <!-- 查询和其他操作 -->
       <div class="filter-container">
-        <el-input v-model="goodsQuery.goodsSn" clearable class="filter-item" style="width: 200px;" placeholder="请输入商品编号"/>
+        <el-input v-model="goodsQuery.goodsSn" clearable class="filter-item" style="width: 200px;" placeholder="请输入商品编号" />
         <el-input v-model="goodsQuery.name" clearable class="filter-item" style="width: 200px;" placeholder="请输入商品名称"/>
         <el-button class="filter-item" type="primary" icon="el-icon-search" @click="getGoodsList">查找</el-button>
       </div>
@@ -242,7 +242,7 @@ export default {
       uploadPath,
       list: null,
       total: 0,
-      urlList:[],
+
       goodsTotal:0,
       listLoading: true,
       goodsListLoad:true,
@@ -279,6 +279,7 @@ export default {
         order: 'desc'
       },
       dataForm: {
+        urlList:[],
         id: undefined,
         name: undefined,
         url: null,
@@ -349,7 +350,6 @@ export default {
       this.dataForm = {
         id: undefined,
         name: undefined,
-        content: undefined,
         url: undefined,
         link: undefined,
         content:null,

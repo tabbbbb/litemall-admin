@@ -13,22 +13,22 @@
           <el-input v-model="goods.name"/>
         </el-form-item>
         <el-form-item label="专柜价格" prop="counterPrice">
-          <el-input type="number" v-model="goods.counterPrice" maxlength="7" placeholder="0.00">
+          <el-input type="number" v-model="goods.counterPrice" maxlength="7" placeholder="0.00" @input="$forceUpdate()">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
         <el-form-item label="一类价格" prop="onePrice">
-          <el-input type="number" v-model="goods.onePrice" maxlength="7" placeholder="0.00">
+          <el-input type="number" v-model="goods.onePrice" maxlength="7" placeholder="0.00" @input="$forceUpdate()">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
         <el-form-item label="二类价格" prop="twoPrice">
-          <el-input type="number" v-model="goods.twoPrice" maxlength="7" placeholder="0.00">
+          <el-input type="number" v-model="goods.twoPrice" maxlength="7" placeholder="0.00" @input="$forceUpdate()">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
         <el-form-item label="三类价格" prop="threePrice">
-          <el-input type="number" v-model="goods.threePrice" maxlength="7" placeholder="0.00">
+          <el-input type="number" v-model="goods.threePrice" maxlength="7" placeholder="0.00" @input="$forceUpdate()">
             <template slot="append">元</template>
           </el-input>
         </el-form-item>
@@ -208,7 +208,7 @@
 
 
           <el-form-item label="专柜价格">
-            <el-input type="number" v-model="specForm.counterPrice" maxlength="7" placeholder="0.00" :disabled="disabledFlag" >
+            <el-input type="number" v-model="specForm.counterPrice" maxlength="7" placeholder="0.00" :disabled="disabledFlag" @input="$forceUpdate()">
               <template slot="append">元</template>
             </el-input>
           </el-form-item>
@@ -216,7 +216,7 @@
 
 
           <el-form-item label="一类价格" >
-            <el-input type="number" v-model="specForm.onePrice" maxlength="7" placeholder="0.00"  :disabled="disabledFlag">
+            <el-input type="number" v-model="specForm.onePrice" maxlength="7" placeholder="0.00"  :disabled="disabledFlag" @input="$forceUpdate()">
               <template slot="append">元</template>
             </el-input>
           </el-form-item>
@@ -224,7 +224,7 @@
 
 
           <el-form-item label="二类价格" >
-            <el-input type="number" v-model="specForm.twoPrice" maxlength="7" placeholder="0.00" :disabled="disabledFlag" >
+            <el-input type="number" v-model="specForm.twoPrice" maxlength="7" placeholder="0.00" :disabled="disabledFlag"@input="$forceUpdate()">
               <template slot="append">元</template>
             </el-input>
           </el-form-item>
@@ -232,7 +232,7 @@
 
 
           <el-form-item label="三类价格">
-            <el-input type="number" v-model="specForm.threePrice" maxlength="7" placeholder="0.00"  :disabled="disabledFlag" >
+            <el-input type="number" v-model="specForm.threePrice" maxlength="7" placeholder="0.00"  :disabled="disabledFlag" @input="$forceUpdate()" >
               <template slot="append">元</template>
             </el-input>
           </el-form-item>
@@ -283,10 +283,10 @@
       <el-dialog :visible.sync="attributeVisiable" title="设置商品参数">
         <el-form ref="attributeForm" v-model="attributeForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
           <el-form-item label="商品参数名称" prop="attribute">
-            <el-input v-model="attributeForm.attribute" maxlength="7" :disabled="disabledAttr"/>
+            <el-input v-model="attributeForm.attribute" maxlength="7" :disabled="disabledAttr" @input="$forceUpdate()"/>
           </el-form-item>
           <el-form-item label="商品参数值" prop="value">
-            <el-input v-model="attributeForm.value" maxlength="7"/>
+            <el-input v-model="attributeForm.value" maxlength="7" @input="$forceUpdate()"/>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
