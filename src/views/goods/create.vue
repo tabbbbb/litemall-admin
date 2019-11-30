@@ -119,9 +119,7 @@
         <!--</el-form-item>-->
 
 
-        <el-form-item label="商品简介">
-          <el-input v-model="goods.brief"/>
-        </el-form-item>
+
 
         <el-form-item label="商品详细介绍">
           <editor :init="editorInit" v-model="goods.detail"/>
