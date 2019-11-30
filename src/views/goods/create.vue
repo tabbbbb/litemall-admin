@@ -3,7 +3,7 @@
 
     <el-card class="box-card">
       <h3>商品介绍</h3>
-      <el-form ref="goods"  v-model="goods" label-width="150px">
+      <el-form ref="goods"  :model="goods" label-width="150px">
         <el-form-item label="商品编号" prop="goodsSn">
           <el-input
             v-model="goods.goodsSn"
@@ -190,7 +190,7 @@
       </el-table>
 
       <el-dialog :visible.sync="specVisiable" title="设置规格">
-        <el-form ref="specForm"  v-model="specForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form ref="specForm"  :model="specForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
 
 
           <el-form-item label="规格名" prop="specification">
@@ -281,7 +281,7 @@
       </el-table>
 
       <el-dialog :visible.sync="attributeVisiable" title="设置商品参数">
-        <el-form ref="attributeForm" v-model="attributeForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form ref="attributeForm" :model="attributeForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
           <el-form-item label="商品参数名称" prop="attribute">
             <el-input v-model="attributeForm.attribute" maxlength="7" :disabled="disabledAttr" @input="$forceUpdate()"/>
           </el-form-item>

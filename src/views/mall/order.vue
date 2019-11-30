@@ -128,7 +128,7 @@
 
     <!-- 退款对话框 -->
     <el-dialog :visible.sync="notarizeDialogVisible" title="用户收货">
-      <el-form ref="notarizeForm" v-model="notarizeForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="notarizeForm" :model="notarizeForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
         <el-form-item label="订单金额(元)" prop="orderPrice">
           <el-input v-model="notarizeForm.orderPrice"  disabled="true"/>
         </el-form-item>

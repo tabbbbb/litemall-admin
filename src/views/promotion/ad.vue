@@ -67,7 +67,7 @@
 
     <!-- 添加或修改对话框 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :before-close="closeFrom">
-      <el-form ref="dataForm" :rules="rules" v-model="dataForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="dataForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
 
         <el-form-item label="图片位置" prop="position">
           <el-select v-model="dataForm.position" placeholder="请选择" @change="changeName">
