@@ -109,7 +109,7 @@
         </el-table-column>
         <el-table-column prop="level" label="用户等级" show-overflow-tooltip>
           <template slot-scope="scope">
-            <el-tag >{{ levelDic[scope.row.userLevel-1] }}</el-tag>
+            <el-tag >{{ levelDic[levelId.indexOf(scope.row.userLevel)] }}</el-tag>
           </template>
         </el-table-column>
 
@@ -203,6 +203,7 @@ export default {
       userListLoading: true,
       genderDic: ['未知', '男', '女'],
       levelDic: ['普通用户', 'VIP用户', '高级VIP用户'],
+      levelId:[],
       statusDic: ['可用', '禁用', '注销'],
       dataList: [],
       pageShow: true,
@@ -253,11 +254,13 @@ export default {
   created() {
     this.levelDic = []
     listVip(null).then(response => {
-      console.log(response)
-      response.data.data.items.forEach(item =>{
+      this.levelList = response.data.data.items
+      this.levelList.forEach(item =>{
         this.levelDic.push(item.vipType)
+        this.levelId.push(item.id)
       })
     } )
+    console.log("levelDic",this.levelDic)
     this.getList()
 
     roleOptions()
