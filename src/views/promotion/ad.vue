@@ -76,7 +76,7 @@
         </el-form-item>
 
         <el-form-item label="标题" prop="name" v-if="dataForm.position != 1">
-          <el-select v-model="dataForm.name" placeholder="请选择" @change="changeName">
+          <el-select v-model="dataForm.name" placeholder="请选择" @change="changeName" :disabled="true">
             <el-option value="新品上市" label="新品上市"/>
             <el-option value="热门水果" label="热门水果"/>
             <el-option value="特价水果" label="特价水果"/>
@@ -626,6 +626,14 @@ export default {
       this.dataForm.urlList = []
       this.goodsTotal = 0
       this.dataForm.url = ""
+      //固定选择
+      if (this.dataForm.position == 2){
+        this.dataForm.name = "新品上市";
+      } else if (this.dataForm.position == 3){
+        this.dataForm.name = "热门水果";
+      }else{
+        this.dataForm.name = "特价水果";
+      }
       this.resetGoodsQuery()
     },
     toLink(){
