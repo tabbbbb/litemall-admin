@@ -105,6 +105,7 @@
             <img v-if="dataForm.content" :src="dataForm.content" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
+          <p style="color: red;">图片最佳尺寸为375px*220px</p>
         </el-form-item>
 
 

@@ -70,7 +70,7 @@
             <img v-if="goods.picUrl" :src="goods.picUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
           </el-upload>
-          <p style="color: red;">图片最佳尺寸为200px*120px</p>
+          <p style="color: red;">图片最佳尺寸为170*170px，此图片为订单显示图片，购物车显示图片</p>
         </el-form-item>
 
         <el-form-item label="宣传画廊">
@@ -86,7 +86,7 @@
             list-type="picture-card">
             <i class="el-icon-plus"/>
           </el-upload>
-          <p style="color: red;">图片最佳尺寸为375px*260px</p>
+          <p style="color: red;">图片最佳尺寸为375px*260px，第一张为商品页面展示图片</p>
         </el-form-item>
 
         <el-form-item label="商品单位">
@@ -249,6 +249,7 @@
               <img v-if="specForm.picUrl" :src="specForm.picUrl" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"/>
             </el-upload>
+            <p style="color: red;">图片最佳尺寸为1:1 像素越高越清晰</p>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">

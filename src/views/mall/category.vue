@@ -81,7 +81,7 @@
             <img v-if="dataForm.iconUrl" :src="dataForm.iconUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
           </el-upload>
-          <p style="color: red;">最佳尺寸</p>
+          <p style="color: red;">最佳尺寸46*46px</p>
         </el-form-item>
 
 
@@ -96,7 +96,7 @@
             <img v-if="dataForm.iconUrl" :src="dataForm.iconUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
           </el-upload>
-          <p style="color: red;">最佳尺寸510px*200px</p>
+          <p style="color: red;">最佳尺寸255*100px</p>
         </el-form-item>
 
       </el-form>
