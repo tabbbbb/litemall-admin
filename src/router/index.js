@@ -161,8 +161,8 @@ export const asyncRouterMap = [
           title: '订单管理',
           noCache: true
         }
-      },
-      {
+      }
+      /*{
         path: 'issue',
         component: () => import('@/views/mall/issue'),
         name: 'issue',
@@ -171,7 +171,7 @@ export const asyncRouterMap = [
           title: '通用问题',
           noCache: true
         }
-      }
+      }*/
     ]
   },
 
