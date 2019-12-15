@@ -423,10 +423,7 @@ export default {
         this.categoryList = response.data.data.categoryList
         this.brandList = response.data.data.brandList
       })
-      listRegion().then(response => {
-        console.log(response)
-        this.regionList = response.data.data
-      })
+
     },
     handleCategoryChange(value) {
       this.goods.categoryId = value[value.length - 1]
