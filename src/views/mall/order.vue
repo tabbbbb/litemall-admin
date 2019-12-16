@@ -69,6 +69,7 @@
         </el-form-item>
         <el-form-item label="商品信息">
           <el-table :data="orderDetail.orderGoods" border fit highlight-current-row>
+            <el-table-column align="center" label="商品编号" prop="goodsSn" />
             <el-table-column align="center" label="商品名称" prop="goodsName" />
             <el-table-column align="center" label="货品规格" prop="specName" >
               <template slot-scope="scope">

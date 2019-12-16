@@ -451,7 +451,7 @@ export default {
         this.$message.warning("专柜价格必须大于0")
       }else if (data.isOnSale == null){
         this.$message.warning("是否在售请选择")
-      }else if (data.picUrl == null ||  data.picUrl == ""){
+      }else if ((data.picUrl == null ||  data.picUrl == "") && (data.isHot || data.isNew || data.isSale)){
         this.$message.warning("商品图片请选择")
       }else if (data.unit == null ||  data.unit == ""){
         this.$message.warning("商品单位不能为空")
