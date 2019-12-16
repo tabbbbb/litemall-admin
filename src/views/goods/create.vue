@@ -70,7 +70,7 @@
             <img v-if="goods.picUrl" :src="goods.picUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
           </el-upload>
-          <p style="color: red;">图片最佳尺寸为170*170px，此图片为订单显示图片，购物车显示图片</p>
+          <p style="color: red;">图片最佳尺寸为170*170px，展示在首页或是热门水果，特价，新品上市的分类中</p>
         </el-form-item>
 
         <el-form-item label="宣传画廊">
