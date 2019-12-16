@@ -36,26 +36,26 @@
 
         <el-form-item label="是否新品" prop="isNew">
           <el-radio-group v-model="goods.isNew">
-            <el-radio :label="true">新品</el-radio>
             <el-radio :label="false">非新品</el-radio>
+            <el-radio :label="true" >  新品</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否热卖" prop="isHot">
           <el-radio-group v-model="goods.isHot">
-            <el-radio :label="false">普通</el-radio>
-            <el-radio :label="true">热卖</el-radio>
+            <el-radio :label="false">普通&nbsp;&nbsp;&nbsp;</el-radio>
+            <el-radio :label="true" >  热卖</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否在售" prop="isOnSale">
           <el-radio-group v-model="goods.isOnSale">
-            <el-radio :label="true">在售</el-radio>
+            <el-radio :label="true">在售&nbsp;&nbsp;&nbsp;</el-radio>
             <el-radio :label="false">未售</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否特价" prop="isOnSale">
           <el-radio-group v-model="goods.isSale">
-            <el-radio :label="true">特价</el-radio>
             <el-radio :label="false">非特价</el-radio>
+            <el-radio :label="true">特价</el-radio>
           </el-radio-group>
         </el-form-item>
 
@@ -451,7 +451,7 @@ export default {
         this.$message.warning("专柜价格必须大于0")
       }else if (data.isOnSale == null){
         this.$message.warning("是否在售请选择")
-      }else if ((data.picUrl == null ||  data.picUrl == "") && (data.isHot || data.isNew || data.isSale)){
+      }else if ((data.picUrl == null ||  data.picUrl == "") || (data.isHot || data.isNew || data.isSale)){
         this.$message.warning("商品图片请选择")
       }else if (data.unit == null ||  data.unit == ""){
         this.$message.warning("商品单位不能为空")
