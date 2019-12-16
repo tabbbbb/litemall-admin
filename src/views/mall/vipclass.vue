@@ -39,7 +39,7 @@
         <el-form-item label="价格类别" prop="discount">
           <template slot-scope="scope">
             <el-select v-model="dataForm.discount"  placeholder="请选择">
-              <el-option v-for="(item,index) in priceList" :key="index+1" :label="item" :value="index+1" ></el-option>
+              <el-option v-for="(item,index) in priceList" :key="index+1" :label="item" :value="index+1+''" ></el-option>
             </el-select>
           </template>
         </el-form-item>
