@@ -150,10 +150,16 @@ export default {
   },
   created() {
     var goodsId = this.$route.query.goodsId
-    console.log(goodsId)
     if (goodsId != null && goodsId != undefined && goodsId != '') {
       this.listQuery.goodsSn = Number.parseInt(goodsId)
     }
+    if (this.$route.query.page != null ) {
+      this.listQuery.page = this.$route.query.page
+    }
+    if (this.$route.query.limit != null){
+      this.listQuery.limit = this.$route.query.limit
+    }
+
     this.getList()
   },
   methods: {
@@ -175,10 +181,10 @@ export default {
       this.getList()
     },
     handleCreate() {
-      this.$router.push({ path: '/goods/create' })
+      this.$router.push({ path: '/goods/create', query: { page: this.listQuery.page,limit:this.listQuery.limit} })
     },
     handleUpdate(row) {
-      this.$router.push({ path: '/goods/edit', query: { id: row.id }})
+      this.$router.push({ path: '/goods/edit', query: { id: row.id ,page: this.listQuery.page,limit:this.listQuery.limit}})
     },
     showDetail(detail) {
       this.goodsDetail = detail

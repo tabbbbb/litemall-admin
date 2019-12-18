@@ -388,6 +388,8 @@ export default {
         isDefault:0,
         number: 0
       },
+      page: 1,
+      limit: 20,
       specifications: [],
       productVisiable: false,
       attributeVisiable: false,
@@ -439,6 +441,13 @@ export default {
     init: function() {
       if (this.$route.query.id == null) {
         return
+      }
+
+      if (this.$route.query.page != null ) {
+        this.page = this.$route.query.page
+      }
+      if (this.$route.query.limit != null){
+        this.limit = this.$route.query.limit
       }
       const goodsId = this.$route.query.id
       detailGoods(goodsId).then(response => {
@@ -539,7 +548,7 @@ export default {
               title: '成功',
               message: '创建成功'
             })
-            this.$router.push({ path: '/goods/list' })
+            this.$router.push({ path: '/goods/list', query: { page: this.page,limit:this.limit} })
           })
           .catch(response => {
             MessageBox.alert('业务错误：' + response.data.errmsg, '警告', {

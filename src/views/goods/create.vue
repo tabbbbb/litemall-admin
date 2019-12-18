@@ -373,6 +373,8 @@ export default {
       specVisiable: false,
       disabledFlag:false,
       selecedAddress:[],
+      page: 1,
+      limit: 20,
       specForm: {
         specification:null,
         value:null,
@@ -414,6 +416,12 @@ export default {
     }
   },
   created() {
+    if (this.$route.query.page != null ) {
+      this.page = this.$route.query.page
+    }
+    if (this.$route.query.limit != null){
+      this.limit = this.$route.query.limit
+    }
     this.init()
   },
 
@@ -492,7 +500,7 @@ export default {
             title: '成功',
             message: '创建成功'
           })
-          this.$router.push({ path: '/goods/list' })
+          this.$router.push({ path: '/goods/list', query: { page: this.page,limit:this.limit}  })
         }).catch(response => {
           MessageBox.alert('业务错误：' + response.data.errmsg, '警告', {
             confirmButtonText: '确定',
