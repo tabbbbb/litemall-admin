@@ -268,6 +268,7 @@ export default {
         isNew:undefined,
         isHot:undefined,
         isSale:undefined,
+        isOnSale:true,
         sort: 'add_time',
         order: 'desc'
       },
@@ -343,6 +344,7 @@ export default {
         isNew:undefined,
         isHot:undefined,
         isSale:undefined,
+        isOnSale:true,
         sort: 'add_time',
         order: 'desc'
       }
@@ -587,6 +589,9 @@ export default {
         this.$message.warning("选择标题")
         return
       }
+      this.goodsQuery.isNew = undefined
+      this.goodsQuery.isHot = undefined
+      this.goodsQuery.isSale = undefined
       this.goodsSwitchShow = true;
       if (name == "新品上市"){
         this.goodsQuery.isNew = true
@@ -596,19 +601,7 @@ export default {
         this.goodsQuery.isSale = true
       }
       this.settingName = name+"商品设置"
-      this.goodsListLoad =true
-      listGoods(this.goodsQuery).then(response =>{
-        this.goodsList = response.data.data.items
-        this.goodsTotal = response.data.data.total
-        for (let i = 0; i < this.goodsList.length; i++) {
-          if (this.dataForm.linkList.indexOf(this.goodsList[i].goodsSn) != -1){
-            this.goodsList.splice(i,1)
-            i--
-            this.goodsTotal --
-          }
-        }
-      })
-      this.goodsListLoad = false
+      this.getGoodsList()
     },
     choose(id){
       if (this.dataForm.linkList == null){
@@ -650,16 +643,19 @@ export default {
       this.$delete(this.dataForm,"urlList")
     },
     getGoodsList() {
-      this.goodsListLoad = true
-      listGoods(this.goodsQuery).then(response => {
+      this.goodsListLoad =true
+      listGoods(this.goodsQuery).then(response =>{
         this.goodsList = response.data.data.items
         this.goodsTotal = response.data.data.total
-        this.goodsListLoad = false
-      }).catch(() => {
-        this.goodsList = []
-        this.goodsTotal = 0
-        this.goodsListLoad = false
+        for (let i = 0; i < this.goodsList.length; i++) {
+          if (this.dataForm.linkList.indexOf(this.goodsList[i].goodsSn) != -1){
+            this.goodsList.splice(i,1)
+            i--
+            this.goodsTotal --
+          }
+        }
       })
+      this.goodsListLoad = false
     },
     submitSuccess1(response, file, fileList){
       console.log(response)

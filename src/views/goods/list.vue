@@ -5,6 +5,19 @@
     <div class="filter-container">
       <el-input v-model="listQuery.goodsSn" clearable class="filter-item" style="width: 200px;" placeholder="请输入商品编号"/>
       <el-input v-model="listQuery.name" clearable class="filter-item" style="width: 200px;" placeholder="请输入商品名称"/>
+      <el-select @change="changeTypeId" v-model="typeId" style="width: 200px" class="filter-item">
+        <el-option :value="0" label="全部" key=" 0"/>
+        <el-option :value="1" label="新品"  key="1"/>
+        <el-option :value="2" label="热卖"  key="2"/>
+        <el-option :value="3" label="特价"  key="3"/>
+        <el-option :value="4" label="普通"  key="4"/>
+      </el-select>
+      <el-select  v-model="listQuery.isOnSale" style="width: 200px" class="filter-item">
+        <el-option :value="undefined" label="全部"  key="true"/>
+        <el-option :value="true" label="在售中"  key="true"/>
+        <el-option :value="false" label="未售中"  key="false"/>
+      </el-select>
+
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查找</el-button>
       <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">添加</el-button>
       <el-button :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
@@ -135,11 +148,16 @@ export default {
       list: [],
       total: 0,
       listLoading: true,
+      typeId:0,
       listQuery: {
         page: 1,
         limit: 20,
         goodsSn: undefined,
         name: undefined,
+        isOnSale:undefined,
+        isHot:undefined,
+        isSale:undefined,
+        isNew:undefined,
         sort: 'add_time',
         order: 'desc'
       },
@@ -213,6 +231,25 @@ export default {
         excel.export_json_to_excel2(tHeader, this.list, filterVal, '商品信息')
         this.downloadLoading = false
       })
+    },
+    resetTypeId(){
+      this.listQuery.isHot = undefined
+      this.listQuery.isSale = undefined
+      this.listQuery.isNew = undefined
+    },
+    changeTypeId(){
+      this.resetTypeId()
+      if (this.typeId == 1){
+        this.listQuery.isNew = true
+      }else if (this.typeId == 2){
+        this.listQuery.isHot = true
+      }else if (this.typeId == 3){
+        this.listQuery.isSale = true
+      }else if (this.typeId == 4){
+        this.listQuery.isHot = false
+        this.listQuery.isSale = false
+        this.listQuery.isNew = false
+      }
     }
   }
 }

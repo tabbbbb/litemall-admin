@@ -22,7 +22,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="生日" prop="birthday"/>
+      <el-table-column align="center" label="默认地址" prop="defaultAddress"/>
 
       <el-table-column align="center" label="用户等级" prop="userLevel">
         <template slot-scope="scope">
@@ -316,8 +316,8 @@ export default {
       })
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['用户昵称', '手机号码','用户等级', '性别', '生日', '状态']
-        const filterVal = ['nickname', 'mobile','levelChinese', 'genderChinese', 'birthday', 'statusChinese']
+        const tHeader = ['用户昵称', '手机号码','用户等级', '性别', '默认地址', '状态']
+        const filterVal = ['nickname', 'mobile','levelChinese', 'genderChinese', 'defaultAddress', 'statusChinese']
         excel.export_json_to_excel2(tHeader, this.list, filterVal, '用户信息')
         this.downloadLoading = false
       })

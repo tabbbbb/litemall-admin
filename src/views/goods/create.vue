@@ -182,6 +182,7 @@
 
         <el-table-column align="center" label="操作" width="250" class-name="small-padding fixed-width">
           <template slot-scope="scope">
+            <el-button type="primary" size="mini" @click="showUpdateSpecification(scope.row,scope.$index)">修改</el-button>
             <el-button type="danger" size="mini" @click="handleSpecificationDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -254,7 +255,8 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="specVisiable = false">取消</el-button>
-          <el-button type="primary" @click="handleSpecificationAdd">确定</el-button>
+          <el-button type="primary" @click="handleSpecificationAdd" v-if="this.updateOrAdd">确定</el-button>
+          <el-button type="primary" @click="handleSpecificationUpdate" v-if="!this.updateOrAdd">修改</el-button>
         </div>
       </el-dialog>
     </el-card>
@@ -366,6 +368,8 @@ export default {
       newKeyword: '',
       disabledAttr: false,
       regionList:[],
+      updateIndex:0,
+      updateOrAdd:true,
       keywords: [],
       categoryList: [],
       brandList: [],
@@ -574,26 +578,17 @@ export default {
       this.specForm.picUrl = response.data.url
     },
     handleSpecificationShow() {
-      this.specForm = { specification: '', value: '', picUrl: '' }
+      this.specForm = {
+        specification:null,
+        value:null,
+        isDefault:0,
+      }
+      this.changeDefault()
       this.specVisiable = true
     },
     handleSpecificationAdd() {
       let data = this.specForm
-      if (data.specification == "" || data.specification == null){
-        this.$message.warning("规格名不能为空")
-      }else if (data.value == "" || data.value == null){
-        this.$message.warning("规格值不能为空")
-      }else if (data.onePrice == null ||data.onePrice <= 0){
-        this.$message.warning("一类价格必须大于0")
-      }else if (data.twoPrice == null ||data.twoPrice <= 0){
-        this.$message.warning("二类价格必须大于0")
-      }else if (data.threePrice == null ||data.threePrice <= 0){
-        this.$message.warning("三类价格必须大于0")
-      }else if (data.counterPrice == null ||data.counterPrice <= 0){
-        this.$message.warning("专柜价格必须大于0")
-      }else if (data.number == null ||data.number < 1){
-        this.$message.warning("库存数量必须大于0")
-      }else{
+      if (this.verifySpec(data)) {
         var index = this.specifications.length - 1
         for (var i = 0; i < this.specifications.length; i++) {
           const v = this.specifications[i]
@@ -603,16 +598,6 @@ export default {
                 type: 'warning',
                 message: '已经存在规格值:' + v.value
               })
-              this.specForm = {
-                specification:null,
-                value:null,
-                counterPrice: 0,
-                onePrice:0,
-                twoPrice:0,
-                threePrice:0,
-                isDefault:0,
-                number: 0
-              }
               this.disabledFlag = false
               this.specVisiable = false
               return
@@ -780,16 +765,47 @@ export default {
         this.specForm.threePrice = this.goods.threePrice
         this.disabledFlag = true
       }else{
-        this.specForm.counterPrice = 0
-        this.specForm.onePrice = 0
-        this.specForm.twoPrice = 0
-        this.specForm.threePrice = 0
         this.disabledFlag = false
       }
     },
     handleChange(value){
       console.log(value)
       console.log(this.selecedAddress)
+    },
+    verifySpec(data){
+      var flag = false
+      if (data.specification == "" || data.specification == null){
+        this.$message.warning("规格名不能为空")
+      }else if (data.value == "" || data.value == null){
+        this.$message.warning("规格值不能为空")
+      }else if (data.onePrice == null ||data.onePrice <= 0){
+        this.$message.warning("一类价格必须大于0")
+      }else if (data.twoPrice == null ||data.twoPrice <= 0){
+        this.$message.warning("二类价格必须大于0")
+      }else if (data.threePrice == null ||data.threePrice <= 0){
+        this.$message.warning("三类价格必须大于0")
+      }else if (data.counterPrice == null ||data.counterPrice <= 0){
+        this.$message.warning("专柜价格必须大于0")
+      }else if (data.number == null ||data.number < 1){
+        this.$message.warning("库存数量必须大于0")
+      }else{
+        flag = true
+      }
+      return flag
+    },
+    showUpdateSpecification(row,index){
+      console.log("row",row)
+      this.updateIndex = index
+      this.specForm = row;
+      this.updateOrAdd = false
+      this.specVisiable = true
+      this.changeDefault()
+    },
+    handleSpecificationUpdate(){
+      if (this.verifySpec(this.specForm)){
+        this.specifications.splice(this.updateIndex,1,this.specForm)
+        this.specVisiable = false
+      }
     }
   }
 }

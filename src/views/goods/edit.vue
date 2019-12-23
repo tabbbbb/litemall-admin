@@ -167,6 +167,7 @@
 
         <el-table-column align="center" label="操作" width="250" class-name="small-padding fixed-width">
           <template slot-scope="scope">
+            <el-button type="primary" size="mini" @click="showUpdateSpecification(scope.row,scope.$index)">修改</el-button>
             <el-button type="danger" size="mini" @click="handleSpecificationDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -244,13 +245,14 @@
               <img v-if="specForm.picUrl" :src="specForm.picUrl" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"/>
             </el-upload>
-            <p style="color: red;">图片最佳尺寸为1:1 像素越高越清晰</p>
+            <p style="color: red;">图片最佳尺寸为1:1 </p>
           </el-form-item>
 
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="specVisiable = false">取消</el-button>
-          <el-button type="primary" @click="handleSpecificationAdd">确定</el-button>
+          <el-button type="primary" @click="handleSpecificationAdd" v-if="this.updateOrAdd">确定</el-button>
+          <el-button type="primary" @click="handleSpecificationUpdate" v-if="!this.updateOrAdd">修改</el-button>
         </div>
       </el-dialog>
     </el-card>
@@ -369,8 +371,10 @@ export default {
       newKeyword: '',
       disabledAttr:false,
       keywords: [],
+      updateOrAdd:true,
       galleryFileList: [],
       selecedAddress:[],
+      updateIndex:0,
       categoryList: [],
       brandList: [],
       categoryIds: [],
@@ -514,7 +518,7 @@ export default {
         this.$message.warning("宣传画廊请选择")
       }else if (data.categoryId == null ){
         this.$message.warning("商品类别请选择")
-      }else if(this.attributes.length !=  4){
+      }else if(this.attributes.length <  4){
         this.$message.warning("商品参数不能小于4")
       }else{
         var num = 0
@@ -626,10 +630,40 @@ export default {
       this.$forceUpdate()
     },
     handleSpecificationShow() {
+      this.specForm = {
+        specification:null,
+        value:null,
+        isDefault:0,
+      }
+      this.changeDefault()
+      this.updateOrAdd = true
       this.specVisiable = true
     },
     handleSpecificationAdd() {
       let data = this.specForm
+      if (this.verifySpec(data)){
+        var index = this.specifications.length - 1
+        for (var i = 0; i < this.specifications.length; i++) {
+          const v = this.specifications[i]
+          if (v.specification === this.specForm.specification) {
+            index = i
+          }
+        }
+
+        this.specifications.splice(index + 1, 0, this.specForm)
+        this.disabledFlag = false
+        this.specVisiable = false
+
+        this.specToProduct()
+      }
+    },
+    handleSpecificationDelete(row) {
+      const index = this.specifications.indexOf(row)
+      this.specifications.splice(index, 1)
+      this.specToProduct()
+    },
+    verifySpec(data){
+      var flag = false
       if (data.specification == "" || data.specification == null){
         this.$message.warning("规格名不能为空")
       }else if (data.value == "" || data.value == null){
@@ -644,37 +678,10 @@ export default {
         this.$message.warning("专柜价格必须大于0")
       }else if (data.number == null ||data.number < 1){
         this.$message.warning("库存数量必须大于0")
-      }else {
-        var index = this.specifications.length - 1
-        for (var i = 0; i < this.specifications.length; i++) {
-          const v = this.specifications[i]
-          if (v.specification === this.specForm.specification) {
-            index = i
-          }
-        }
-
-        this.specifications.splice(index + 1, 0, this.specForm)
-        this.specForm = {
-          specification:null,
-          value:null,
-          counterPrice: 0,
-          onePrice:0,
-          twoPrice:0,
-          threePrice:0,
-          isDefault:0,
-          number: 0
-        }
-        this.disabledFlag = false
-        this.specVisiable = false
-
-        this.specToProduct()
+      }else{
+        flag = true
       }
-
-    },
-    handleSpecificationDelete(row) {
-      const index = this.specifications.indexOf(row)
-      this.specifications.splice(index, 1)
-      this.specToProduct()
+      return flag
     },
     specToProduct() {
       if (this.specifications.length === 0) {
@@ -829,15 +836,24 @@ export default {
         this.specForm.threePrice = this.goods.threePrice
         this.disabledFlag = true
       }else{
-        this.specForm.counterPrice = 0
-        this.specForm.onePrice = 0
-        this.specForm.twoPrice = 0
-        this.specForm.threePrice = 0
         this.disabledFlag = false
       }
     },
     changeRadio(){
       console.log(this.goods.isSale)
+    },
+    showUpdateSpecification(row,index){
+      this.updateIndex = index
+      this.specForm = row;
+      this.updateOrAdd = false
+      this.specVisiable = true
+      this.changeDefault()
+    },
+    handleSpecificationUpdate(){
+     if (this.verifySpec(this.specForm)){
+       this.specifications.splice(this.updateIndex,1,this.specForm)
+       this.specVisiable = false
+     }
     }
   }
 }
