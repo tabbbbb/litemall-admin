@@ -377,8 +377,6 @@ export default {
       specVisiable: false,
       disabledFlag:false,
       selecedAddress:[],
-      page: 1,
-      limit: 20,
       specForm: {
         specification:null,
         value:null,
@@ -420,12 +418,6 @@ export default {
     }
   },
   created() {
-    if (this.$route.query.page != null ) {
-      this.page = this.$route.query.page
-    }
-    if (this.$route.query.limit != null){
-      this.limit = this.$route.query.limit
-    }
     this.init()
   },
 
@@ -441,7 +433,19 @@ export default {
       this.goods.categoryId = value[value.length - 1]
     },
     handleCancel: function() {
-      this.$router.push({ path: '/goods/goods' })
+      this.$router.push({ path: '/goods/list', query: {
+          page: this.$route.query.page,
+          limit: this.$route.query.limit,
+          goodsSn: this.$route.query.goodsSn,
+          name: this.$route.query.name,
+          isOnSale:this.$route.query.isOnSale,
+          isHot:this.$route.query.isHot,
+          isSale:this.$route.query.isSale,
+          isNew:this.$route.query.isNew,
+          sort: this.$route.query.sort,
+          order: this.$route.query.order,
+          typeId:this.$route.query.typeId
+        }  })
     },
     handlePublish: function() {
       let data = this.goods
@@ -504,7 +508,7 @@ export default {
             title: '成功',
             message: '创建成功'
           })
-          this.$router.push({ path: '/goods/list', query: { page: this.page,limit:this.limit}  })
+         this.handleCancel()
         }).catch(response => {
           MessageBox.alert('业务错误：' + response.data.errmsg, '警告', {
             confirmButtonText: '确定',

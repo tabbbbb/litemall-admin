@@ -171,13 +171,50 @@ export default {
     if (goodsId != null && goodsId != undefined && goodsId != '') {
       this.listQuery.goodsSn = Number.parseInt(goodsId)
     }
-    if (this.$route.query.page != null ) {
-      this.listQuery.page = this.$route.query.page
+    var page = this.$route.query.page
+    var limit = this.$route.query.limit
+    var goodsSn = this.$route.query.goodsSn
+    var name = this.$route.query.name
+    var isOnSale = this.$route.query.isOnSale
+    var isHot = this.$route.query.isHot
+    var isSale = this.$route.query.isSale
+    var isNew = this.$route.query.isNew
+    var sort = this.$route.query.sort
+    var order = this.$route.query.order
+    this.typeId = this.$route.query.typeId
+    if (this.typeId == null){
+      this.typeId = 0
     }
-    if (this.$route.query.limit != null){
-      this.listQuery.limit = this.$route.query.limit
+    if (page != null){
+      this.listQuery.page = page
     }
-
+    if (limit != null){
+      this.listQuery.limit = limit
+    }
+    if (goodsSn != null){
+      this.listQuery.goodsSn = goodsSn
+    }
+    if (name != null){
+      this.listQuery.name = name
+    }
+    if (isOnSale != null){
+      this.listQuery.isOnSale = isOnSale
+    }
+    if (isHot != null){
+      this.listQuery.isHot = isHot
+    }
+    if (isSale != null){
+      this.listQuery.isSale = isSale
+    }
+    if (isNew != null){
+      this.listQuery.isNew = isNew
+    }
+    if (sort != null){
+      this.listQuery.sort = sort
+    }
+    if (order != null){
+      this.listQuery.order = order
+    }
     this.getList()
   },
   methods: {
@@ -199,10 +236,34 @@ export default {
       this.getList()
     },
     handleCreate() {
-      this.$router.push({ path: '/goods/create', query: { page: this.listQuery.page,limit:this.listQuery.limit} })
+      this.$router.push({ path: '/goods/create', query: { page: this.listQuery.page,
+          limit: this.listQuery.limit,
+          goodsSn: this.listQuery.goodsSn,
+          name: this.listQuery.name,
+          isOnSale:this.listQuery.isOnSale,
+          isHot:this.listQuery.isHot,
+          isSale:this.listQuery.isSale,
+          isNew:this.listQuery.isNew,
+          sort: this.listQuery.sort,
+          order: this.listQuery.order,
+          typeId:this.typeId
+      } })
     },
     handleUpdate(row) {
-      this.$router.push({ path: '/goods/edit', query: { id: row.id ,page: this.listQuery.page,limit:this.listQuery.limit}})
+      this.$router.push({ path: '/goods/edit', query: {
+        id:row.id,
+          page: this.listQuery.page,
+          limit: this.listQuery.limit,
+          goodsSn: this.listQuery.goodsSn,
+          name: this.listQuery.name,
+          isOnSale:this.listQuery.isOnSale,
+          isHot:this.listQuery.isHot,
+          isSale:this.listQuery.isSale,
+          isNew:this.listQuery.isNew,
+          sort: this.listQuery.sort,
+          order: this.listQuery.order,
+          typeId:this.typeId
+        }})
     },
     showDetail(detail) {
       this.goodsDetail = detail

@@ -392,8 +392,6 @@ export default {
         isDefault:0,
         number: 0
       },
-      page: 1,
-      limit: 20,
       specifications: [],
       productVisiable: false,
       attributeVisiable: false,
@@ -446,13 +444,6 @@ export default {
       if (this.$route.query.id == null) {
         return
       }
-
-      if (this.$route.query.page != null ) {
-        this.page = this.$route.query.page
-      }
-      if (this.$route.query.limit != null){
-        this.limit = this.$route.query.limit
-      }
       const goodsId = this.$route.query.id
       detailGoods(goodsId).then(response => {
         this.goods = response.data.data.goods
@@ -487,7 +478,19 @@ export default {
       this.goods.categoryId = value[value.length - 1]
     },
     handleCancel: function() {
-      this.$router.push({ path: '/goods/list' })
+      this.$router.push({ path: '/goods/list', query: {
+          page: this.$route.query.page,
+          limit: this.$route.query.limit,
+          goodsSn: this.$route.query.goodsSn,
+          name: this.$route.query.name,
+          isOnSale:this.$route.query.isOnSale,
+          isHot:this.$route.query.isHot,
+          isSale:this.$route.query.isSale,
+          isNew:this.$route.query.isNew,
+          sort: this.$route.query.sort,
+          order: this.$route.query.order,
+          typeId:this.$route.query.typeId
+        }  })
     },
     handleEdit: function() {
 
@@ -552,7 +555,7 @@ export default {
               title: '成功',
               message: '创建成功'
             })
-            this.$router.push({ path: '/goods/list', query: { page: this.page,limit:this.limit} })
+            this.handleCancel()
           })
           .catch(response => {
             MessageBox.alert('业务错误：' + response.data.errmsg, '警告', {
